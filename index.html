@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vision Assessment — CCRS Clear Vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#08101E;--navy-mid:#111C30;--blue:#2563EB;--blue-hover:#1D4ED8;
+  --blue-pale:#EFF6FF;--blue-light:#DBEAFE;--teal:#0D9488;
+  --text:#0F172A;--text-mid:#334155;--text-muted:#64748B;
+  --border:#E2E8F0;--border-hover:#94A3B8;--bg:#FFFFFF;--bg-soft:#F8FAFC;
+  --green:#059669;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--navy);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:20px 16px 48px;position:relative;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:-30%;left:50%;transform:translateX(-50%);
+  width:900px;height:600px;
+  background:radial-gradient(ellipse,rgba(37,99,235,.1) 0%,transparent 70%);
+  pointer-events:none;z-index:0;}
+.app-wrap{width:100%;max-width:620px;position:relative;z-index:1;}
+.brand{text-align:center;margin-bottom:18px;}
+.brand-name{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);}
+
+/* Card */
+.card{background:var(--bg);border-radius:24px;padding:38px 44px 34px;
+  box-shadow:0 4px 24px rgba(0,0,0,.2),0 24px 80px rgba(0,0,0,.35);position:relative;overflow:hidden;}
+.card-accent{position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#2563EB 0%,#0D9488 50%,#7C3AED 100%);}
+
+/* Progress */
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.progress-label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
+.progress-count{font-size:12px;color:var(--text-muted);}
+.progress-track{height:3px;background:#E2E8F0;border-radius:3px;overflow:hidden;margin-bottom:26px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2563EB,#0D9488);border-radius:3px;transition:width .45s cubic-bezier(.4,0,.2,1);}
+
+/* Question */
+.q-step{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:7px;}
+.q-text{font-family:'DM Serif Display',serif;font-size:21px;line-height:1.35;color:var(--text);margin-bottom:5px;}
+.q-sub{font-size:13.5px;line-height:1.65;color:var(--text-muted);margin-bottom:20px;}
+
+/* Options */
+.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 15px;border:1.5px solid var(--border);
+  border-radius:12px;cursor:pointer;background:var(--bg);text-align:left;width:100%;
+  font-family:inherit;transition:border-color .15s,background .15s,transform .1s;}
+.opt:hover{border-color:#93C5FD;background:#F0F7FF;transform:translateY(-1px);}
+.opt.selected{border-color:var(--blue);background:var(--blue-pale);}
+.opt:active{transform:scale(.998);}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s;}
+.opt.selected .opt-radio{border-color:var(--blue);background:var(--blue);}
+.opt-dot{width:6px;height:6px;border-radius:50%;background:white;opacity:0;transform:scale(0);transition:opacity .15s,transform .15s;}
+.opt.selected .opt-dot{opacity:1;transform:scale(1);}
+.opt-body{flex:1;}
+.opt-label{font-size:14px;font-weight:500;color:var(--text);line-height:1.3;}
+.opt-desc{font-size:12px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+.opt.selected .opt-label{color:#1E40AF;}
+.opt.selected .opt-desc{color:#3B82F6;}
+
+/* Detail textarea */
+.detail-wrap{margin-bottom:16px;}
+.detail-label{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;
+  letter-spacing:.04em;color:var(--text-muted);margin-bottom:7px;}
+.detail-label svg{flex-shrink:0;opacity:.5;}
+.detail-optional{font-size:10.5px;font-weight:400;color:#94A3B8;margin-left:auto;}
+.detail-box{padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:15px;font-family:inherit;color:var(--text);width:100%;resize:none;min-height:72px;
+  background:var(--bg-soft);line-height:1.55;transition:border-color .15s;display:block;-webkit-appearance:none;}
+.detail-box:focus{outline:none;border-color:#93C5FD;background:#F8FBFF;}
+.detail-box::placeholder{color:#94A3B8;}
+
+/* Insight panel */
+.insight-panel{background:linear-gradient(135deg,#EFF6FF 0%,#F0FDFA 100%);border:1px solid #BFDBFE;
+  border-radius:14px;padding:15px 18px;margin-bottom:18px;display:none;}
+.insight-panel.visible{display:block;animation:insightIn .35s cubic-bezier(.4,0,.2,1);}
+@keyframes insightIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.insight-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.insight-icon-wrap{width:26px;height:26px;border-radius:8px;background:white;border:1px solid #BFDBFE;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.insight-label{font-size:10.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#2563EB;}
+.insight-text{font-size:13.5px;line-height:1.65;color:#1E40AF;}
+.insight-loading{display:flex;align-items:center;gap:8px;}
+.insight-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#93C5FD;
+  margin:0 2px;animation:dotPulse 1.2s ease-in-out infinite;}
+.insight-dots span:nth-child(2){animation-delay:.2s;}
+.insight-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+.insight-loading-label{font-size:12px;color:#60A5FA;font-style:italic;}
+
+/* Nav */
+.nav-row{display:flex;justify-content:space-between;align-items:center;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:10px;
+  font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;border:none;text-decoration:none;}
+.btn-primary{background:var(--blue);color:white;box-shadow:0 1px 2px rgba(37,99,235,.3);}
+.btn-primary:hover{background:var(--blue-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.35);}
+.btn-primary:disabled{background:#CBD5E1;color:#94A3B8;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1.5px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border-hover);background:var(--bg-soft);}
+
+/* Welcome */
+.welcome-eye{width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#EFF6FF,#F0FDFA);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;border:1px solid #DBEAFE;}
+.welcome-title{font-family:'DM Serif Display',serif;font-size:27px;line-height:1.22;color:var(--text);margin-bottom:12px;}
+.welcome-desc{font-size:15px;line-height:1.7;color:var(--text-mid);margin-bottom:20px;}
+.procs-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.proc-chip{font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text-muted);background:var(--bg-soft);}
+.feature-list{display:flex;flex-direction:column;gap:9px;margin-bottom:24px;padding:16px 18px;background:var(--bg-soft);border-radius:12px;border:1px solid var(--border);}
+.feature-item{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--text-mid);line-height:1.4;}
+.feature-check{width:17px;height:17px;border-radius:50%;background:#DCFCE7;border:1px solid #BBF7D0;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.btn-start{width:100%;justify-content:center;padding:14px;font-size:15px;background:var(--navy);color:white;
+  border-radius:12px;font-family:inherit;cursor:pointer;border:none;font-weight:500;
+  transition:all .15s;letter-spacing:.01em;display:flex;align-items:center;gap:8px;}
+.btn-start:hover{background:#1E293B;transform:translateY(-1px);}
+
+/* Results loading */
+.rload-wrap{text-align:center;padding:32px 0 16px;}
+.rload-spinner{width:36px;height:36px;border:2.5px solid #E2E8F0;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.rload-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:8px;}
+.rload-sub{font-size:14px;color:var(--text-muted);line-height:1.6;}
+.rload-steps{display:flex;flex-direction:column;gap:10px;margin-top:24px;text-align:left;}
+.rls{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);}
+.rls-dot{width:7px;height:7px;border-radius:50%;background:#CBD5E1;flex-shrink:0;}
+.rls.active .rls-dot{background:var(--blue);animation:dotPulse 1.2s ease-in-out infinite;}
+.rls.done .rls-dot{background:var(--green);}
+.rls.active{color:var(--text);font-weight:500;}
+
+/* Results */
+.results-badge{display:inline-flex;align-items:center;gap:6px;background:#F0FDF4;border:1px solid #BBF7D0;
+  color:#166534;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:20px;margin-bottom:12px;}
+.results-title{font-family:'DM Serif Display',serif;font-size:25px;color:var(--text);margin-bottom:8px;}
+.results-sub{font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:20px;}
+.ai-summary{background:#F8FAFF;border:1px solid #C7D7FA;border-radius:16px;padding:20px 22px;margin-bottom:22px;}
+.ai-summary-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ai-chip{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:#4F46E5;background:#EEF2FF;border:1px solid #C7D2FE;padding:3px 9px;border-radius:6px;}
+.ai-name{font-size:12px;color:var(--text-muted);}
+.ai-text{font-size:14px;line-height:1.75;color:var(--text-mid);font-style:italic;}
+.proc-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:26px;}
+.proc-card{border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;background:var(--bg);}
+.proc-card.rank-1{border-color:#93C5FD;background:#F0F7FF;}
+.proc-card.rank-2,.proc-card.rank-3{background:var(--bg-soft);}
+.proc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.proc-name{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);}
+.rank-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:6px;white-space:nowrap;margin-top:2px;}
+.rb-1{background:#DBEAFE;color:#1E40AF;}.rb-2{background:#F0FDF4;color:#166534;}.rb-3{background:#FEF3C7;color:#92400E;}
+.proc-tagline{font-size:12px;font-style:italic;color:#2563EB;margin-bottom:7px;opacity:.85;}
+.proc-desc{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:11px;}
+.proc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.tag{font-size:11px;padding:3px 8px;border-radius:6px;background:white;border:1px solid var(--border);color:var(--text-muted);}
+.proc-card.rank-1 .tag{border-color:#BFDBFE;color:#1D4ED8;}
+.proc-link{font-size:13px;color:var(--blue);text-decoration:none;font-weight:500;display:inline-flex;align-items:center;gap:4px;}
+.proc-link:hover{color:var(--blue-hover);text-decoration:underline;}
+
+/* Trust section */
+.trust-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.tdl{flex:1;height:1px;background:var(--border);}
+.tdt{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;}
+.dr-card{display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;margin-bottom:18px;}
+.dr-avatar{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#1E40AF,#0D9488);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dr-name{font-size:14.5px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.dr-title{font-size:12px;color:var(--text-muted);line-height:1.4;margin-bottom:8px;}
+.dr-creds{display:flex;flex-wrap:wrap;gap:5px;}
+.cred-tag{font-size:11px;padding:2px 8px;border-radius:6px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;}
+.consult-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.consult-step{display:flex;align-items:flex-start;gap:12px;}
+.cs-num{width:24px;height:24px;border-radius:50%;background:var(--blue);color:white;font-size:11.5px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.cs-title{font-size:13.5px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.cs-desc{font-size:12.5px;color:var(--text-muted);line-height:1.4;}
+
+/* CTA box */
+.cta-box{background:var(--navy-mid);border-radius:16px;padding:26px;color:white;text-align:center;border:1px solid rgba(255,255,255,.06);margin-bottom:16px;}
+.cta-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:6px;}
+.cta-body{font-size:13.5px;opacity:.65;line-height:1.6;margin-bottom:18px;max-width:370px;margin-left:auto;margin-right:auto;}
+.cta-btns{display:flex;flex-direction:column;gap:10px;}
+.btn-white{display:block;background:white;color:var(--navy);font-size:14.5px;font-weight:500;font-family:inherit;
+  padding:13px 28px;border-radius:10px;text-decoration:none;cursor:pointer;transition:all .15s;border:none;text-align:center;}
+.btn-white:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.3);}
+.btn-outline-w{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);
+  font-size:13.5px;font-weight:400;font-family:inherit;padding:11px 20px;border-radius:9px;cursor:pointer;transition:all .15s;text-align:center;}
+.btn-outline-w:hover{background:rgba(255,255,255,.07);color:white;}
+.cta-locs{margin-top:10px;font-size:11px;opacity:.3;letter-spacing:.05em;}
+.cta-noop{font-size:11.5px;opacity:.4;margin-top:12px;}
+
+/* Contact */
+.contact-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);margin-bottom:8px;}
+.contact-sub{font-size:14px;color:var(--text-muted);line-height:1.65;margin-bottom:24px;padding-bottom:22px;border-bottom:1px solid var(--border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:12px;font-weight:500;color:var(--text-mid);}
+.form-label span{color:#EF4444;margin-left:2px;}
+.form-input,.form-select,.form-textarea{padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;color:var(--text);background:var(--bg);transition:border-color .15s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:#93C5FD;background:#FAFCFF;}
+.form-textarea{resize:vertical;min-height:75px;line-height:1.5;}
+.form-select{cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.form-note{font-size:11.5px;color:var(--text-muted);background:var(--bg-soft);border:1px solid var(--border);border-radius:9px;padding:10px 13px;line-height:1.55;margin-bottom:16px;}
+.btn-submit{width:100%;padding:14px;background:var(--navy);color:white;border:none;border-radius:11px;
+  font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-submit:hover{background:#1E293B;transform:translateY(-1px);}
+.back-link{text-align:center;margin-top:13px;}
+.back-link button{background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:inherit;transition:color .15s;}
+.back-link button:hover{color:var(--text);}
+
+/* Thank you */
+.ty-icon{width:64px;height:64px;border-radius:50%;background:#F0FDF4;border:1.5px solid #BBF7D0;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.ty-title{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);margin-bottom:10px;}
+.ty-sub{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:24px;}
+.next-steps-box{background:var(--bg-soft);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:22px;}
+.nst-head{font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;}
+.nst-item{display:flex;gap:10px;font-size:13.5px;color:var(--text-mid);line-height:1.5;padding:8px 0;border-bottom:1px solid var(--border);}
+.nst-item:last-child{border-bottom:none;padding-bottom:0;}
+.nst-n{font-weight:500;color:var(--blue);flex-shrink:0;}
+
+/* Ineligible */
+.inelig-icon{width:54px;height:54px;border-radius:50%;background:#FEF3C7;border:1px solid #FDE68A;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+
+/* Results nav */
+.results-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px;}
+.rnb{background:none;border:none;color:rgba(255,255,255,.35);font-size:12.5px;cursor:pointer;font-family:inherit;transition:color .15s;padding:4px 0;}
+.rnb:hover{color:rgba(255,255,255,.65);}
+.rns{color:rgba(255,255,255,.15);font-size:12px;}
+
+/* Disclaimer */
+.disclaimer{text-align:center;font-size:11px;color:rgba(255,255,255,.22);line-height:1.6;margin-top:14px;padding:0 8px;}
+
+/* Animations */
+.screen{animation:screenIn .3s cubic-bezier(.4,0,.2,1);}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:600px){
+  body{padding:14px 12px 40px;}
+  .card{padding:24px 18px 22px;border-radius:18px;}
+  .welcome-title{font-size:23px;}
+  .welcome-desc{font-size:14px;}
+  .btn-start{font-size:15px;padding:14px 16px;}
+  .q-text{font-size:19px;}
+  .q-sub{font-size:13px;}
+  .q-step{font-size:10.5px;}
+  /* Bigger tap targets on options */
+  .opt{padding:13px 14px;min-height:52px;}
+  .opt-label{font-size:14.5px;}
+  .opt-desc{font-size:12.5px;}
+  .opt-radio{width:20px;height:20px;flex-shrink:0;}
+  .opt-dot{width:7px;height:7px;}
+  /* Detail box */
+  .detail-box{font-size:16px;min-height:76px;} /* 16px prevents iOS zoom on focus */
+  .detail-label{font-size:12px;}
+  /* Nav buttons full-width on mobile */
+  .nav-row{gap:10px;}
+  .btn{padding:13px 18px;font-size:14.5px;flex:1;justify-content:center;}
+  /* Insight panel */
+  .insight-panel{padding:13px 14px;}
+  .insight-text{font-size:13px;}
+  /* Results */
+  .results-title{font-size:22px;}
+  .results-sub{font-size:13.5px;}
+  .ai-summary{padding:16px 16px;}
+  .ai-text{font-size:13.5px;}
+  .proc-card{padding:15px 16px;}
+  .proc-name{font-size:17px;}
+  .proc-desc{font-size:12.5px;}
+  .dr-card{flex-direction:column;gap:10px;}
+  .dr-avatar{width:40px;height:40px;}
+  .cs-title{font-size:13px;}
+  .cs-desc{font-size:12px;}
+  /* CTA box */
+  .cta-box{padding:20px 16px;}
+  .cta-title{font-size:18px;}
+  .cta-body{font-size:13px;}
+  .btn-white,.btn-outline-w{font-size:14px;padding:12px 16px;}
+  /* Contact form */
+  .form-grid{grid-template-columns:1fr;}
+  .form-input,.form-select,.form-textarea{font-size:16px;} /* prevent iOS zoom */
+  .contact-title{font-size:21px;}
+  /* Results nav */
+  .results-nav{flex-direction:column;gap:6px;}
+  .rnb{font-size:13px;}
+}
+</style>
+</head>
+<body>
+<div class="app-wrap">
+  <div class="brand"><span class="brand-name">CCRS Clear Vision · Vision Assessment</span></div>
+  <div id="app"></div>
+  <p class="disclaimer" id="disc">For informational and educational purposes only. Not a substitute for a comprehensive ophthalmological examination.</p>
+</div>
+
+<script>
+/* ── CONFIG ──────────────────────────────────────────────────────── */
+const CFG = {
+  // Production: set to your server-side proxy that calls Anthropic API
+  // Accepts POST { question, answer, detail } → { insight: string }
+  apiProxy: null,
+  // Production: set to your CRM / form backend
+  formUrl: null,
+  consultUrl: 'https://ccrsclearvision.com/contact-us/',
+  phone: '(323) 933-3111'
+};
+
+/* ── FALLBACK INSIGHTS ───────────────────────────────────────────── */
+const FI = {
+  age: {
+    u21: "Prescription stability is the first requirement for elective vision correction — most surgeons look for at least 12–24 months of no meaningful change. You're building toward eligibility, and starting this research now puts you well ahead of the curve when the time comes.",
+    '21-40': "You're in the ideal window. Corneal tissue is at peak health and resilience, prescriptions are typically stable, and recovery tends to be fastest at this stage. Whether it's LASIK, SMILE, or EVO ICL, patients in this range consistently achieve outstanding outcomes.",
+    '41-55': "Your 40s introduce presbyopia — the gradual stiffening of the natural lens that makes near focus progressively harder. This doesn't narrow your options; it actually expands them. Modern procedures like RLE with a multifocal IOL can restore clear vision at every distance simultaneously.",
+    '56+': "At this stage, the natural lens has often lost significant focusing range, and early lens changes may be present. Premium IOL procedures — RLE or refractive cataract surgery — address both refractive error and lens aging in a single, highly precise procedure."
+  },
+  vision: {
+    myopia: "Nearsightedness is one of the most consistently treatable conditions in refractive surgery. LASIK, SMILE, and EVO ICL all achieve excellent results for myopia — the right choice depends on your prescription strength, corneal thickness, and lifestyle factors.",
+    astig: "Astigmatism results from an irregularly shaped cornea and is handled extremely well by modern laser platforms. Both LASIK and SMILE correct astigmatism in the same pass as myopia, with toric IOL options available for lens-based procedures — no extra steps required.",
+    hyperopia: "Farsightedness often responds best to lens-based procedures, particularly as near-focus difficulty enters the picture. The corneal profile in hyperopic eyes is also better preserved with lens-based approaches, supporting stronger long-term outcomes.",
+    presbyopia: "Presbyopia is a lens-aging process, not a refractive error per se — the lens has simply lost its flexibility. Lens-based procedures like RLE directly address the root cause, replacing the stiffened lens with a premium IOL that restores near, intermediate, and distance focus.",
+    cloudy: "Progressive cloudiness, dimness, and halos around lights are hallmark signs of cataract development. Modern refractive cataract surgery has evolved far beyond basic correction — premium IOL options can restore your full refractive range while removing the cataract in a single procedure."
+  },
+  rx: {
+    mild: "Mild prescriptions respond extremely well to laser correction. LASIK in particular achieves very predictable, stable outcomes at this range — most patients achieve 20/20 or better, with a smooth, fast recovery.",
+    mod: "Moderate prescriptions sit comfortably within the treatable range for LASIK and SMILE. If corneal thickness is a limiting factor, EVO ICL becomes an equally excellent alternative — it corrects vision without removing any corneal tissue at all.",
+    high: "Higher prescriptions benefit significantly from SMILE or EVO ICL, both of which handle larger corrections more favorably. The ICL is particularly compelling at high myopia — it delivers exceptional visual quality without touching the corneal surface.",
+    vhigh: "At very high prescriptions, EVO ICL is typically the preferred choice — its correction range extends to -20 diopters of myopia and doesn't depend on corneal thickness. A pre-surgical mapping exam will pinpoint exactly where you fall and which approach offers the best result."
+  },
+  readers: {
+    'yes-always': "Daily reliance on reading glasses indicates well-established presbyopia. A premium multifocal or trifocal IOL through RLE is specifically engineered for this — restoring clear near, intermediate, and distance vision so most patients are completely glasses-free afterward.",
+    'yes-some': "Occasional reading difficulty is an early signal that your natural lens is beginning to lose flexibility. Addressing this now gives you the most flexibility in procedure choice and typically produces the smoothest transition to near-vision freedom.",
+    no: "Intact near vision at your age is an asset — your natural lens still has good accommodative range. For many patients in this situation, laser correction alone can fully address their vision needs without any lens-based component."
+  },
+  dryeye: {
+    none: "Healthy tear function is a genuine advantage for all vision correction procedures. Stable ocular surface health optimizes both surgical outcomes and long-term comfort.",
+    mild: "Mild dryness is very common and highly manageable. Most surgeons recommend a targeted pre-treatment protocol — typically 4–8 weeks of prescription drops — to optimize the ocular surface before surgery and improve outcomes.",
+    moderate: "With moderate dry eye, SMILE and EVO ICL become the most attractive options. SMILE preserves more corneal nerve fibers than LASIK, which supports better long-term tear production, while ICL doesn't interact with the corneal surface at all.",
+    severe: "Chronic dry eye is the most important variable in procedure selection. EVO ICL is typically recommended for severe cases — it has zero impact on corneal nerves or the tear film, making it the most compatible option for a compromised ocular surface."
+  },
+  lifestyle: {
+    desk: "An indoor, lower-impact lifestyle is compatible with all vision correction options. Without contact sport concerns, procedure choice can focus entirely on prescription, corneal anatomy, and visual goals.",
+    active: "Freedom from glasses and contacts during physical activity is one of the most meaningful benefits of vision correction. All major procedures are well-suited to active lifestyles — most patients return to exercise within a week.",
+    sport: "High-impact and competitive sports favor SMILE or EVO ICL over traditional LASIK, primarily because neither involves a corneal flap that could be displaced. EVO ICL is particularly popular with competitive athletes for its exceptional optical stability.",
+    contact: "Contact and combat sports make EVO ICL the gold standard recommendation. There's no flap, no corneal thinning, and the lens sits securely behind the iris — fully protected from impact. It's the preferred choice for boxers, martial artists, and contact sport athletes."
+  },
+  nightvision: {
+    clear: "Good baseline night vision is a positive indicator across all procedures. Modern laser platforms and premium IOLs are specifically engineered to preserve and often enhance contrast sensitivity and low-light visual performance.",
+    mild: "Mild halos and glare are often related to astigmatism or early lens changes, and they can actually improve significantly after correction. Your surgeon will measure pupil size and corneal wavefront to choose the treatment approach that best minimizes aberrations.",
+    sig: "Significant nighttime symptoms warrant careful evaluation — they can indicate early cataracts, irregular corneal topography, or a larger pupil size. Identifying the underlying cause is essential to selecting a procedure that improves rather than worsens these symptoms."
+  },
+  conditions: {
+    none: "No history of eye disease puts you in the best possible starting position. There are no known contraindications at this point — just clean data for your surgeon to work with.",
+    keratoconus: "Keratoconus and thin corneas are contraindications for tissue-removal laser procedures, but EVO ICL is an excellent alternative — it adds a lens inside the eye without touching the cornea at all. Corneal cross-linking to stabilize progression may also be relevant.",
+    glaucoma: "Elevated eye pressure or glaucoma requires careful evaluation before any vision correction. IOP management needs to be stable, and certain procedures can temporarily affect pressure readings. Dr. Lee coordinates with glaucoma specialists as needed.",
+    other: "Individual eye conditions vary widely in how they affect surgical planning. Dr. Lee has extensive experience with complex histories — the consultation is specifically designed to review your full records and determine the safest, most effective path forward."
+  },
+  surgery: {
+    none: "First-time candidates have the full range of options available. No prior procedure constraints to work around — your surgeon has maximum flexibility in building your treatment plan.",
+    lasik: "Prior LASIK or PRK changes the corneal profile but doesn't rule out further correction. Enhancement procedures, ICL addition, or lens-based approaches may all be viable depending on current anatomy, residual prescription, and corneal thickness.",
+    cataract: "Having had cataract surgery means your natural lens has already been replaced. Residual refractive error may be addressable with a laser enhancement or piggyback IOL — your surgeon can evaluate this precisely with current imaging.",
+    other: "Prior eye surgery is important context but rarely a barrier. Dr. Lee has extensive experience with complex surgical histories and will review your prior records thoroughly."
+  },
+  pregnant: {
+    no: "Hormonal stability is important for accurate pre-surgical measurements, and you're clear to proceed with your assessment and follow-up clinical evaluation.",
+    yes: "Hormonal shifts during pregnancy and nursing temporarily affect corneal curvature and prescription — making pre-surgical measurements unreliable. All elective procedures should wait until several months after nursing ends. We'd be glad to plan your consultation for that time."
+  },
+  goal: {
+    distance: "Clear unaided distance vision — for driving, travel, sports, and daily life — is the most common goal, and one that laser and lens procedures fulfill with remarkable consistency. Most patients achieve 20/20 or better.",
+    reading: "Eliminating reading glasses is one of the most personally meaningful vision goals. Premium IOL procedures with multifocal or EDOF lenses are specifically engineered for this — restoring the near-focus flexibility your natural lens has gradually lost.",
+    both: "Full spectacle independence at all distances — near, intermediate, and far — is achievable with today's premium trifocal and EDOF IOLs. Most patients report being completely glasses-free for everything from reading menus to night driving.",
+    freedom: "Waking up to clear, natural vision every morning is one of the most transformative experiences refractive surgery delivers. The right procedure, precisely matched to your anatomy and prescription, provides exactly that — consistently and permanently."
+  }
+};
+
+/* ── QUESTIONS ───────────────────────────────────────────────────── */
+const Qs = [
+  { id:'age', text:'How old are you?',
+    sub:'Age is the most important factor in determining which procedures are safe, effective, and appropriate for your vision.',
+    dp:'Any context about your age or how long you\'ve worn glasses/contacts?',
+    opts:[{v:'u21',l:'Under 21',d:'Vision may still be changing year to year'},
+          {v:'21-40',l:'21 to 40',d:'Prime window for laser and lens-based correction'},
+          {v:'41-55',l:'41 to 55',d:'Near-vision or reading changes may be a factor'},
+          {v:'56+',l:'56 or older',d:'Lens-based procedures are often most appropriate'}] },
+  { id:'vision', text:'What best describes your vision problem?',
+    sub:'Choose the option that most closely matches what your eye doctor has told you — or what you notice day to day.',
+    dp:'Has your prescription changed recently? Any other symptoms?',
+    opts:[{v:'myopia',l:'Nearsighted',d:'Distant objects blurry — driving, TV, distance'},
+          {v:'astig',l:'Nearsighted + astigmatism',d:'Blurry at distance plus distortion or halos at night'},
+          {v:'hyperopia',l:'Farsighted',d:'Near objects blurry or cause headaches / eye strain'},
+          {v:'presbyopia',l:'Trouble reading up close only',d:'Recently needing reading glasses; distance vision still fine'},
+          {v:'cloudy',l:'Cloudy, foggy, or progressively dim',d:'Vision has worsened; glare or halos around lights'}] },
+  { id:'rx', text:'What is your approximate prescription strength?',
+    sub:'Check your eyeglass or contact lens Rx. Minus (−) = nearsighted. Plus (+) = farsighted.',
+    skip: a => a.vision==='presbyopia'||a.vision==='cloudy',
+    dp:'Know your exact Rx numbers? Feel free to share them here.',
+    opts:[{v:'mild',l:'Mild',d:'Under ±3.00 — light correction needed'},
+          {v:'mod',l:'Moderate',d:'±3.00 to ±6.00 — rely on corrective lenses daily'},
+          {v:'high',l:'High',d:'±6.00 to ±10.00 — thick lenses, strong contacts'},
+          {v:'vhigh',l:'Very high / not sure',d:'Greater than ±10.00, or unsure of exact Rx'}] },
+  { id:'readers', text:'Do you currently need reading glasses?',
+    sub:'Near-vision difficulty after 40 is a key presbyopia signal that directly influences which procedures deliver the best outcome.',
+    skip: a => a.age==='u21'||a.age==='21-40',
+    dp:'When did this start? Any other notes about your near vision?',
+    opts:[{v:'yes-always',l:'Yes — every day',d:'Can\'t read comfortably without reading glasses'},
+          {v:'yes-some',l:'Yes — occasionally',d:'Fine print or dim light requires them'},
+          {v:'no',l:'No — near vision is still sharp',d:'No reading glasses needed yet'}] },
+  { id:'dryeye', text:'How would you describe your eye dryness or irritation?',
+    sub:'Tear film health significantly influences which procedure is the safest, most comfortable choice for your eyes.',
+    dp:'Do you use artificial tears? Have you been diagnosed with dry eye disease?',
+    opts:[{v:'none',l:'Rarely or never',d:'Eyes are comfortable most of the time'},
+          {v:'mild',l:'Occasionally',d:'Mild dryness in AC, wind, or on screens'},
+          {v:'moderate',l:'Frequently — I use eye drops',d:'Regular reliance on artificial tears; daily discomfort'},
+          {v:'severe',l:'Severe or chronic',d:'Diagnosed dry eye disease or constant symptoms'}] },
+  { id:'lifestyle', text:'How would you describe your physical lifestyle?',
+    sub:'Activity level — especially contact sports — is critical for determining which procedure is the most stable and safest long-term.',
+    dp:'Any specific sports or activities you\'re hoping to protect your vision for?',
+    opts:[{v:'desk',l:'Mostly indoors / desk-based',d:'Office, home, low-impact daily life'},
+          {v:'active',l:'Moderately active',d:'Gym, yoga, hiking, cycling, recreational sports'},
+          {v:'sport',l:'Competitive or high-impact sports',d:'Running, swimming, tennis, skiing, surfing, etc.'},
+          {v:'contact',l:'Contact or combat sports',d:'Boxing, MMA, wrestling, football, hockey'}] },
+  { id:'nightvision', text:'How is your night vision currently?',
+    sub:'Night vision quality can reveal underlying conditions that affect your treatment path.',
+    dp:'Any specific night-vision situations that concern you?',
+    opts:[{v:'clear',l:'Clear — no issues',d:'Comfortable driving at night, no visual artifacts'},
+          {v:'mild',l:'Mild halos or glare',d:'Slight rings around headlights or streetlamps'},
+          {v:'sig',l:'Significant halos or glare',d:'Noticeable difficulty with night driving or bright lights'}] },
+  { id:'conditions', text:'Have you been diagnosed with any of these eye conditions?',
+    sub:'Certain conditions directly affect which procedures are safe and appropriate for you.',
+    dp:'Any other diagnoses, family eye history, or concerns?',
+    opts:[{v:'none',l:'None of these',d:'No known eye disease diagnoses'},
+          {v:'keratoconus',l:'Keratoconus or thin corneas',d:'Irregular, thinning, or cone-shaped cornea'},
+          {v:'glaucoma',l:'Glaucoma or elevated eye pressure',d:'Elevated IOP or optic nerve changes'},
+          {v:'other',l:'Other condition / unsure',d:'Retinal issues, amblyopia, or uncertain history'}] },
+  { id:'surgery', text:'Have you had previous eye surgery?',
+    dp:'Details about prior surgery (procedure, year, complications) are helpful to include.',
+    opts:[{v:'none',l:'No — this would be my first',d:''},
+          {v:'lasik',l:'Yes — prior LASIK or PRK',d:'May be considering an enhancement or retreatment'},
+          {v:'cataract',l:'Yes — cataract surgery',d:''},
+          {v:'other',l:'Yes — other eye surgery',d:''}] },
+  { id:'pregnant', text:'Are you currently pregnant or nursing?',
+    sub:'Elective vision correction is postponed during pregnancy and breastfeeding — a medical requirement, not a permanent barrier.',
+    opts:[{v:'no',l:'No',d:''},
+          {v:'yes',l:'Yes — currently pregnant or nursing',d:''}] },
+  { id:'goal', text:'What is your primary vision goal?',
+    sub:'Understanding your priorities helps us match you to the procedure that delivers the most meaningful outcome for your life.',
+    dp:'Anything specific driving this goal — career, sport, lifestyle change?',
+    opts:[{v:'distance',l:'See clearly at distance without glasses',d:'Driving, movies, sports, everyday distance vision'},
+          {v:'reading',l:'Read without glasses',d:'Menus, phones, books — no more reading glasses'},
+          {v:'both',l:'Both near and far vision',d:'Comprehensive correction at all distances'},
+          {v:'freedom',l:'Complete glasses freedom',d:'Wake up and simply see clearly every morning'}] }
+];
+
+/* ── PROC INFO ───────────────────────────────────────────────────── */
+const PI = {
+  lasik:{name:'LASIK',tagline:'The gold standard in laser vision correction',
+    desc:'LASIK uses a computer-guided excimer laser to reshape the cornea, correcting nearsightedness, farsightedness, and astigmatism. The procedure takes ~15 minutes, and most patients see clearly within 24 hours. CCRS uses the ALCON Wavelight EX500 — one of the fastest, most accurate platforms available worldwide.',
+    tags:['Mild to moderate Rx','24-hour visual recovery','Most performed globally','ALCON EX500 laser'],url:'https://ccrsclearvision.com/lasik/'},
+  smile:{name:'SMILE',tagline:'Next-generation flapless laser correction',
+    desc:'SMILE (Small Incision Lenticule Extraction) is a minimally invasive, flapless procedure performed entirely through a 2–4mm keyhole incision. No corneal flap means fewer dry eye concerns, greater corneal integrity, and a faster return to physical activity. Dr. Lee is a recognized SMILE pioneer.',
+    tags:['Flapless technique','Dry-eye friendly','Active & contact sports','High myopia range'],url:'https://ccrsclearvision.com/smile-lasik/'},
+  icl:{name:'EVO ICL',tagline:'Implantable lens for extraordinary clarity',
+    desc:'The EVO Implantable Collamer Lens is placed inside the eye, behind the iris — without removing any corneal tissue. It corrects very high prescriptions (up to −20D), is fully reversible, has a built-in UV filter, and carries no dry eye risk. CCRS ranks among the top national EVO ICL providers.',
+    tags:['High & very high Rx','Reversible & additive','No corneal tissue removed','Top national ICL center'],url:'https://ccrsclearvision.com/icl-surgery/'},
+  rle:{name:'Refractive Lens Exchange (RLE)',tagline:'Comprehensive vision freedom for 40+',
+    desc:'RLE replaces the natural eye lens with a premium multifocal or extended-depth IOL, restoring clear near, intermediate, and distance vision simultaneously. Because the natural lens is replaced, cataracts are permanently prevented. Ideal when both distance and reading vision are priorities.',
+    tags:['Age 40+','Eliminates reading glasses','Prevents cataracts permanently','Premium multifocal IOL'],url:'https://ccrsclearvision.com/refractive-lens-exchange/'},
+  cataract:{name:'Refractive Cataract Surgery',tagline:'Restore clarity with advanced IOL technology',
+    desc:'Modern cataract surgery at CCRS is a precision vision-restoration procedure. Dr. Lee uses the ALCON ARGOS biometer and Optiwave ORA intraoperative system for surgical-grade accuracy. Premium IOL options can correct distance, reading, and astigmatism simultaneously.',
+    tags:['Cloudy or dimming vision','Halos & night glare','Premium IOL options','Often insurance-covered'],url:'https://ccrsclearvision.com/refractive-cataract-surgery/'}
+};
+
+/* ── SCORING ─────────────────────────────────────────────────────── */
+function score(a){
+  const s={lasik:0,smile:0,icl:0,rle:0,cataract:0};
+  if(a.age==='u21')return null;
+  if(a.pregnant==='yes')return'pregnant';
+  if(a.age==='56+'){s.cataract+=5;s.rle+=4;}
+  if(a.age==='41-55'){s.rle+=3;s.lasik+=1;s.smile+=1;s.cataract+=1;}
+  if(a.age==='21-40'){s.lasik+=3;s.smile+=3;s.icl+=3;}
+  if(a.vision==='myopia'){s.lasik+=3;s.smile+=3;s.icl+=2;}
+  if(a.vision==='astig'){s.lasik+=3;s.smile+=2;s.icl+=2;}
+  if(a.vision==='hyperopia'){s.lasik+=2;s.rle+=3;}
+  if(a.vision==='presbyopia'){s.rle+=5;s.lasik+=1;}
+  if(a.vision==='cloudy'){s.cataract+=6;s.rle+=3;}
+  if(a.rx==='mild'){s.lasik+=3;s.smile+=1;}
+  if(a.rx==='mod'){s.lasik+=2;s.smile+=3;s.icl+=1;}
+  if(a.rx==='high'){s.icl+=4;s.smile+=3;s.lasik+=1;}
+  if(a.rx==='vhigh'){s.icl+=5;s.rle+=3;s.smile+=1;}
+  if(a.readers==='yes-always'){s.rle+=4;}
+  if(a.readers==='yes-some'){s.rle+=2;}
+  if(a.dryeye==='moderate'){s.lasik-=2;s.smile+=2;s.icl+=1;}
+  if(a.dryeye==='severe'){s.lasik-=4;s.smile+=3;s.icl+=2;}
+  if(a.lifestyle==='contact'){s.icl+=3;s.smile+=2;s.lasik-=2;}
+  if(a.lifestyle==='sport'){s.smile+=1;s.icl+=1;}
+  if(a.nightvision==='sig'){s.cataract+=2;s.rle+=1;}
+  if(a.conditions==='keratoconus'){s.lasik=0;s.smile=0;s.icl+=3;}
+  if(a.conditions==='glaucoma'){s.icl=Math.max(0,s.icl-2);}
+  if(a.surgery==='lasik'){s.icl+=1;s.rle+=1;}
+  if(a.surgery==='cataract'){s.rle=0;s.cataract=0;}
+  if(a.goal==='reading'){s.rle+=2;}
+  if(a.goal==='both'){s.rle+=1;s.icl+=1;}
+  if(a.goal==='freedom'){s.rle+=1;s.icl+=1;}
+  Object.keys(s).forEach(k=>{if(s[k]<0)s[k]=0;});
+  return s;
+}
+
+/* ── STATE ───────────────────────────────────────────────────────── */
+let screen='welcome',qIdx=0,answers={},details={},activeQs=[],
+    insCache={},inState={status:'hidden',text:''},inKey='',
+    summary='',ranked=[],dtOpen={};
+
+function activeQ(){return Qs.filter(q=>!q.skip||!q.skip(answers));}
+
+/* ── API ─────────────────────────────────────────────────────────── */
+async function callInsightAPI(qText,optLabel,detail){
+  const msg=`Question: "${qText}"\nPatient selected: "${optLabel}"${detail?`\nPatient notes: "${detail}"`:''}
+
+Provide a warm, specific, educational 2-3 sentence insight (under 65 words) about what this answer means for their vision correction journey. Reference their specific answer directly. Be like a knowledgeable friend who happens to be an eye doctor. Plain text only, no formatting, no lists.`;
+  try{
+    if(CFG.apiProxy){
+      const r=await fetch(CFG.apiProxy,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:qText,answer:optLabel,detail})});
+      return(await r.json()).insight||'';
+    }
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:160,
+      system:`You are a patient education assistant at CCRS Clear Vision in Los Angeles, guided by Dr. Paul C. Lee MD — a SMILE pioneer and one of the nation's leading refractive surgeons. When a patient answers a vision assessment question, give a warm, specific 2-3 sentence educational insight (under 65 words) about what their answer means clinically. Reference their specific answer directly. Tone: knowledgeable friend who happens to be an eye doctor — reassuring, plain-language, educational. No markdown, no bullets, plain text only.`,
+      messages:[{role:'user',content:msg}]})});
+    return(await r.json()).content?.[0]?.text?.trim()||'';
+  }catch(e){return'';}
+}
+
+async function loadInsight(q,val){
+  const key=`${q.id}-${val}`;inKey=key;
+  if(insCache[key]){inState={status:'ready',text:insCache[key]};patchInsight();return;}
+  inState={status:'loading',text:''};patchInsight();
+  const opt=q.opts.find(o=>o.v===val);
+  const text=await callInsightAPI(q.text,opt?.l||val,details[q.id]||'')||FI[q.id]?.[val]||'';
+  if(inKey===key){insCache[key]=text;inState={status:'ready',text};patchInsight();}
+}
+
+function patchInsight(){
+  const p=document.getElementById('ip');if(!p)return;
+  if(inState.status==='hidden'){p.classList.remove('visible');return;}
+  p.classList.add('visible');
+  if(inState.status==='loading'){
+    const q=activeQs[qIdx];
+    const hasDetail=q&&details[q.id]&&details[q.id].trim().length>0;
+    p.innerHTML=`<div class="insight-loading"><div class="insight-dots"><span></span><span></span><span></span></div><span class="insight-loading-label">${hasDetail?'Updating with your notes…':'Analyzing your response…'}</span></div>`;
+  }else if(inState.text){
+    const q=activeQs[qIdx];
+    const hasDetail=q&&details[q.id]&&details[q.id].trim().length>0;
+    p.innerHTML=`<div class="insight-header"><div class="insight-icon-wrap"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="7" rx="5.5" ry="3.5" stroke="#2563EB" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.2"/><circle cx="7.8" cy="6.2" r="0.6" fill="#2563EB"/></svg></div><span class="insight-label">What this means for you</span>${hasDetail?'<span style="font-size:10px;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;padding:2px 7px;border-radius:5px;margin-left:4px;">Personalized to your notes</span>':''}</div><div class="insight-text">${inState.text}</div>`;
+  }
+}
+
+async function buildSummary(ans,rnk,dets){
+  const at=Object.entries(ans).map(([k,v])=>{
+    const q=Qs.find(q=>q.id===k);const opt=q?.opts.find(o=>o.v===v);
+    return`${q?.text||k}: ${opt?.l||v}${dets[k]?` [patient note: "${dets[k]}"]`:''}`;
+  }).join('\n');
+  const tp=rnk.slice(0,2).map(([p])=>PI[p].name).join(' and ');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:220,
+      system:'You are a patient education assistant at CCRS Clear Vision in Los Angeles. Write personalized, warm, educational vision profile summaries. Make the patient feel seen, understood, and informed. No markdown, plain text only.',
+      messages:[{role:'user',content:`Patient vision assessment answers:\n${at}\n\nTop matched procedures: ${tp}\n\nWrite a personalized 3-4 sentence vision profile summary. Explain their situation specifically, why these procedures match, and what makes their profile unique. Warm, expert, reassuring tone. Under 90 words.`}]})});
+    return(await r.json()).content?.[0]?.text?.trim()||'';
+  }catch(e){return'';}
+}
+
+function fallbackSummary(rnk){
+  const f={
+    lasik:"Based on your profile, you appear to be a strong candidate for laser vision correction. Your prescription range, eye health history, and lifestyle all align well with LASIK — the most commonly performed and most extensively studied elective vision procedure in the world.",
+    smile:"Your profile points to SMILE as a particularly well-suited option — combining effective correction with the flapless, dry-eye-friendly design that fits your eye health and active lifestyle. Dr. Lee is a recognized SMILE pioneer with extensive experience at the leading edge of this technique.",
+    icl:"Your assessment suggests EVO ICL as a strong match — likely due to prescription strength, lifestyle factors, or dry eye considerations. The ICL's additive, reversible design makes it one of the most versatile and optically precise procedures available, and CCRS ranks among the nation's top ICL centers.",
+    rle:"Your vision profile — particularly the combination of age and near-vision needs — points clearly toward a lens-based solution. Refractive Lens Exchange with a premium IOL is specifically designed for your situation: restoring comprehensive, glasses-free vision at all distances while permanently preventing future cataracts.",
+    cataract:"Your responses suggest lens changes may be contributing to your vision symptoms. Modern refractive cataract surgery at CCRS is a precision procedure — with premium IOL options, it can restore your full refractive range while addressing the underlying lens issue."
+  };
+  return f[rnk[0]?.[0]]||'';
+}
+
+/* ── RENDER ──────────────────────────────────────────────────────── */
+function render(){
+  const app=document.getElementById('app'),disc=document.getElementById('disc');
+  if(screen.startsWith('inelig')){app.innerHTML=renderIneligible(screen);disc.style.display='none';return;}
+  const map={welcome:renderWelcome,question:renderQuestion,'results-loading':renderLoading,results:renderResults,contact:renderContact,thankyou:renderThankyou};
+  app.innerHTML=(map[screen]||renderWelcome)();
+  disc.style.display=['results','contact','thankyou'].includes(screen)?'none':'block';
+}
+
+function renderWelcome(){return`<div class="card screen"><div class="card-accent"></div>
+<div class="welcome-eye"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><ellipse cx="14" cy="14" rx="11" ry="7" stroke="#2563EB" stroke-width="1.5"/><circle cx="14" cy="14" r="4" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/><circle cx="15.5" cy="12.5" r="1" fill="#2563EB"/></svg></div>
+<div class="welcome-title">Find Your Vision<br>Correction Match</div>
+<div class="welcome-desc">Answer 11 questions about your vision, lifestyle, and goals. At every step, you'll receive a personalized clinical insight — so you walk away educated and informed, not just categorized.</div>
+<div class="procs-row"><span class="proc-chip">LASIK</span><span class="proc-chip">SMILE</span><span class="proc-chip">EVO ICL</span><span class="proc-chip">RLE</span><span class="proc-chip">Cataract Surgery</span></div>
+<div class="feature-list">
+  <div class="feature-item"><div class="feature-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Personalized AI insights at every question — not just at the end</div>
+  <div class="feature-item"><div class="feature-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Add your own detail — your notes shape a personalized AI vision profile</div>
+  <div class="feature-item"><div class="feature-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Contact info comes after the results — we lead with education, not lead capture</div>
+</div>
+<button class="btn-start" onclick="startQuiz()"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="9" cy="9" rx="7" ry="4.5" stroke="white" stroke-width="1.3"/><circle cx="9" cy="9" r="2.5" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.3"/></svg>Begin Free Vision Assessment</button>
+</div>`;}
+
+function renderQuestion(){
+  const q=activeQs[qIdx];
+  const pct=Math.round(((qIdx+1)/activeQs.length)*100);
+  const sel=answers[q.id],isLast=qIdx===activeQs.length-1;
+  const insHtml=sel?(inState.status==='loading'
+    ?`<div class="insight-loading"><div class="insight-dots"><span></span><span></span><span></span></div><span class="insight-loading-label">Analyzing your response…</span></div>`
+    :inState.text?`<div class="insight-header"><div class="insight-icon-wrap"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="7" rx="5.5" ry="3.5" stroke="#2563EB" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.2"/><circle cx="7.8" cy="6.2" r="0.6" fill="#2563EB"/></svg></div><span class="insight-label">What this means for you</span></div><div class="insight-text">${inState.text}</div>`:''):'';
+  return`<div class="card screen"><div class="card-accent"></div>
+<div class="progress-row"><span class="progress-label">Vision Assessment</span><span class="progress-count">${qIdx+1} / ${activeQs.length}</span></div>
+<div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+<div class="q-step">Question ${qIdx+1}</div>
+<div class="q-text">${q.text}</div>
+${q.sub?`<div class="q-sub">${q.sub}</div>`:'<div style="height:14px"></div>'}
+<div class="options-list">
+${q.opts.map(o=>`<button class="opt${sel===o.v?' selected':''}" onclick="pick('${q.id}','${o.v}')"><div class="opt-radio"><div class="opt-dot"></div></div><div class="opt-body"><div class="opt-label">${o.l}</div>${o.d?`<div class="opt-desc">${o.d}</div>`:''}</div></button>`).join('')}
+</div>
+${q.dp?`<div class="detail-wrap">
+  <div class="detail-label">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="#64748B" stroke-width="1.3" stroke-linecap="round"/></svg>
+    Add detail <span class="detail-optional">optional — improves your insight</span>
+  </div>
+  <textarea class="detail-box" id="dtb-${q.id}" placeholder="${q.dp}" oninput="saveDetail('${q.id}',this.value)">${details[q.id]||''}</textarea>
+</div>`:''}
+<div class="insight-panel${sel?' visible':''}" id="ip">${insHtml}</div>
+<div class="nav-row">
+  <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+  <button class="btn btn-primary" onclick="goNext()"${!sel?' disabled':''}>${isLast?'See My Results →':'Continue →'}</button>
+</div></div>`;}
+
+function renderLoading(){return`<div class="card screen"><div class="card-accent"></div>
+<div class="rload-wrap">
+  <div class="rload-spinner"></div>
+  <div class="rload-title">Building your vision profile…</div>
+  <div class="rload-sub">Personalizing your results based on all your answers.</div>
+  <div class="rload-steps">
+    <div class="rls done"><div class="rls-dot"></div>Scoring your responses across 5 procedures</div>
+    <div class="rls active"><div class="rls-dot"></div>Generating your personalized AI vision profile</div>
+    <div class="rls"><div class="rls-dot"></div>Preparing your procedure recommendations</div>
+  </div>
+</div></div>`;}
+
+function renderResults(){
+  const result=score(answers);
+  if(!result){screen='inelig-age';render();return'';}
+  if(result==='pregnant'){screen='inelig-pregnant';render();return'';}
+  const rnk=Object.entries(result).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  if(!rnk.length){screen='inelig-general';render();return'';}
+  ranked=rnk;
+  const bl=['Best Match','Also Consider','Also Consider'],bc=['rb-1','rb-2','rb-3'],cc=['rank-1','rank-2','rank-3'];
+  return`<div class="card screen"><div class="card-accent"></div>
+<div class="results-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Assessment Complete</div>
+<div class="results-title">Your Personalized Results</div>
+<div class="results-sub">Based on your complete profile, here's what your vision picture looks like — and which CCRS procedures are the strongest match for your situation.</div>
+${summary?`<div class="ai-summary"><div class="ai-summary-head"><div class="ai-chip"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#4F46E5" stroke-width="1"/><path d="M3 5L4.5 6.5L7 3.5" stroke="#4F46E5" stroke-width="1" stroke-linecap="round"/></svg>AI Vision Profile</div><span class="ai-name">personalized to your answers</span></div><div class="ai-text">${summary}</div></div>`:''}
+<div class="proc-cards">
+${rnk.map(([p],i)=>{const pr=PI[p];return`<div class="proc-card ${cc[i]}"><div class="proc-top"><div class="proc-name">${pr.name}</div><span class="rank-badge ${bc[i]}">${bl[i]}</span></div><div class="proc-tagline">${pr.tagline}</div><div class="proc-desc">${pr.desc}</div><div class="proc-tags">${pr.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div><a href="${pr.url}" target="_blank" class="proc-link">Learn more about ${pr.name} →</a></div>`;}).join('')}
+</div>
+<div style="margin-bottom:24px;">
+  <div class="trust-divider"><div class="tdl"></div><div class="tdt">Your CCRS team</div><div class="tdl"></div></div>
+  <div class="dr-card">
+    <div class="dr-avatar"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="white" stroke-width="1.3"/><path d="M3 19c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    <div><div class="dr-name">Dr. Paul C. Lee, MD</div><div class="dr-title">Medical Director, CCRS Clear Vision · Refractive & Cataract Surgery Specialist</div><div class="dr-creds"><span class="cred-tag">SMILE Pioneer</span><span class="cred-tag">Top National ICL Surgeon</span><span class="cred-tag">ZEISS VisuMax Certified</span><span class="cred-tag">ALCON EX500 Platform</span></div></div>
+  </div>
+  <div class="trust-divider" style="margin-bottom:14px;"><div class="tdl"></div><div class="tdt">What to expect at your free consultation</div><div class="tdl"></div></div>
+  <div class="consult-steps">
+    <div class="consult-step"><div class="cs-num">1</div><div><div class="cs-title">Comprehensive eye mapping (45–60 min)</div><div class="cs-desc">Corneal topography, pachymetry, wavefront analysis, biometry, and full refraction — the most thorough pre-surgical workup available.</div></div></div>
+    <div class="consult-step"><div class="cs-num">2</div><div><div class="cs-title">Honest candidacy review from Dr. Lee</div><div class="cs-desc">He reviews your imaging personally and gives you a straightforward recommendation — including if he believes you're not an ideal candidate.</div></div></div>
+    <div class="consult-step"><div class="cs-num">3</div><div><div class="cs-title">Your questions, fully answered</div><div class="cs-desc">No time limits, no sales pressure. The consultation is designed around your understanding and confidence.</div></div></div>
+  </div>
+</div>
+<div class="cta-box">
+  <div class="cta-title">Ready to Take the Next Step?</div>
+  <div class="cta-body">Schedule your free consultation with Dr. Lee's team. No commitment required — just a thorough, honest evaluation of your vision.</div>
+  <div class="cta-btns">
+    <button class="btn-white" onclick="screen='contact';render()">Request My Free Consultation</button>
+    <a href="tel:+13239333111" class="btn-outline-w">Call us: (323) 933-3111</a>
+  </div>
+  <div class="cta-noop">No obligation. No sales pressure. Just clear answers.</div>
+  <div class="cta-locs">Sherman Oaks · Los Angeles (Wilshire) · Pasadena</div>
+</div>
+<p style="font-size:11px;color:#94A3B8;text-align:center;margin-top:14px;line-height:1.6;">This assessment is not a medical evaluation. Only a qualified ophthalmologist can determine candidacy through a comprehensive dilated eye exam.</p>
+<div class="results-nav"><button class="rnb" onclick="goBackFromResults()">← Revise my answers</button><span class="rns">·</span><button class="rnb" onclick="resetQuiz()">Start over</button></div>
+</div>`;}
+
+function renderContact(){
+  const top=ranked[0]?PI[ranked[0][0]].name:'';
+  return`<div class="card screen"><div class="card-accent"></div>
+<div style="margin-bottom:8px;"><div class="results-badge" style="display:inline-flex;"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Free Consultation Request</div></div>
+<div class="contact-title">Let's Talk About Your Vision</div>
+<div class="contact-sub">Fill in as much or as little as you're comfortable with. Our team will reach out to confirm a time that works for you — no commitment required.</div>
+<div class="form-grid">
+  <div class="form-group"><label class="form-label">First name<span>*</span></label><input class="form-input" id="ff" type="text" placeholder="Jane"/></div>
+  <div class="form-group"><label class="form-label">Last name<span>*</span></label><input class="form-input" id="fl" type="text" placeholder="Smith"/></div>
+  <div class="form-group"><label class="form-label">Phone number<span>*</span></label><input class="form-input" id="fp" type="tel" placeholder="(310) 555-0100"/></div>
+  <div class="form-group"><label class="form-label">Email address</label><input class="form-input" id="fe" type="email" placeholder="jane@email.com"/></div>
+  <div class="form-group full"><label class="form-label">Preferred location</label>
+    <select class="form-select" id="floc"><option value="">No preference</option><option>Sherman Oaks</option><option>Los Angeles (Wilshire Blvd)</option><option>Pasadena</option></select></div>
+  <div class="form-group full"><label class="form-label">Best time to reach you</label>
+    <select class="form-select" id="ft"><option value="">No preference</option><option>Morning (9am – 12pm)</option><option>Afternoon (12pm – 5pm)</option><option>Evening (5pm – 7pm)</option></select></div>
+  <div class="form-group full"><label class="form-label">Questions for Dr. Lee? (optional)</label>
+    <textarea class="form-textarea" id="fn" placeholder="e.g. I have dry eye — am I still a candidate for SMILE?"></textarea></div>
+</div>
+${top?`<div class="form-note">Your top match was <strong>${top}</strong>. We'll share your assessment results with the team so your consultation starts from a fully informed place — no need to re-explain everything.</div>`:''}
+<button class="btn-submit" onclick="submitForm()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M9 3L14 8L9 13" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Send My Consultation Request</button>
+<div class="back-link"><button onclick="screen='results';render()">← Back to my results</button></div>
+</div>`;}
+
+function renderThankyou(){return`<div class="card screen" style="text-align:center;">
+<div class="card-accent"></div>
+<div class="ty-icon"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14L11 19L22 9" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+<div class="ty-title">We'll Be in Touch Soon</div>
+<div class="ty-sub">Thank you for completing your vision assessment. The CCRS team has received your request and will contact you within one business day to confirm your consultation appointment.</div>
+<div class="next-steps-box">
+  <div class="nst-head">What happens next</div>
+  <div class="nst-item"><span class="nst-n">1.</span>A CCRS team member will call or email to schedule your free consultation at the most convenient location.</div>
+  <div class="nst-item"><span class="nst-n">2.</span>Your assessment results will be shared with Dr. Lee's team in advance so your appointment is focused and efficient.</div>
+  <div class="nst-item"><span class="nst-n">3.</span>You'll receive a comprehensive eye mapping and honest, personalized candidacy review from Dr. Lee — no obligation to proceed.</div>
+</div>
+<a href="${CFG.consultUrl}" target="_blank" style="display:block;background:var(--navy);color:white;text-align:center;padding:13px;border-radius:11px;font-size:14.5px;font-weight:500;text-decoration:none;transition:all .15s;margin-bottom:14px;">Learn More About CCRS Clear Vision →</a>
+<div style="font-size:12px;color:var(--text-muted);">Questions? Call us at <a href="tel:+13239333111" style="color:var(--blue);">(323) 933-3111</a></div>
+</div>`;}
+
+function renderIneligible(type){
+  const msgs={'inelig-age':{title:"Come Back When You're 21",body:"You're under 21, which means your prescription may still be changing year to year. Elective vision correction requires at least 12–24 months of stability. We recommend a comprehensive exam once you're 21 to establish your baseline — and we're happy to answer any questions in the meantime.",cta:'Contact CCRS with Questions'},
+  'inelig-pregnant':{title:'Please Wait Until After Nursing',body:"Hormonal changes during pregnancy and breastfeeding temporarily alter corneal curvature and prescription — making pre-surgical measurements unreliable. All elective procedures should wait until several months after nursing ends. We'd be glad to plan your consultation for that time.",cta:'Request a Future Consultation'},
+  'inelig-general':{title:"Let's Discuss Your Situation",body:"Your responses suggest a more complex clinical picture than this assessment can evaluate. Conditions like keratoconus, glaucoma, or a prior surgical history require in-depth clinical evaluation. Dr. Lee is experienced with complex cases and will give you a thorough, honest assessment.",cta:'Schedule a Consultation'}};
+  const m=msgs[type]||msgs['inelig-general'];
+  return`<div class="card screen"><div class="card-accent"></div>
+<div style="text-align:center;padding:8px 0;">
+  <div class="inelig-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 7V11M11 15H11.01M11 20C16.5 20 21 15.5 21 11C21 6.5 16.5 2 11 2C6.5 2 2 6.5 2 11C2 15.5 6.5 20 11 20Z" stroke="#D97706" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+  <div class="results-title" style="margin-bottom:10px;">${m.title}</div>
+  <div class="results-sub" style="margin-bottom:26px;">${m.body}</div>
+  <div class="cta-box"><div class="cta-title">Speak Directly with CCRS</div><div class="cta-body">Our team is happy to answer your questions and help you find the right path forward.</div>
+    <div class="cta-btns"><a href="${CFG.consultUrl}" target="_blank" class="btn-white">${m.cta}</a><a href="tel:+13239333111" class="btn-outline-w">Call (323) 933-3111</a></div>
+    <div class="cta-locs">Sherman Oaks · Los Angeles · Pasadena</div>
+  </div>
+  <div class="results-nav"><button class="rnb" onclick="goBackFromResults()">← Revise my answers</button><span class="rns">·</span><button class="rnb" onclick="resetQuiz()">Start over</button></div>
+</div></div>`;}
+
+/* ── ACTIONS ─────────────────────────────────────────────────────── */
+function startQuiz(){inState={status:'hidden',text:''};inKey='';activeQs=activeQ();qIdx=0;screen='question';render();}
+
+function pick(id,val){
+  const prev=answers[id];answers[id]=val;
+  if(prev!==val){inState={status:'loading',text:''};render();const q=activeQs[qIdx];loadInsight(q,val);}
+  else render();
+}
+
+// toggleDetail removed — textarea is now always visible
+
+let _dtTimer=null;
+function saveDetail(id,val){
+  details[id]=val;
+  // Re-fetch the insight with the new detail after a 900ms pause (debounced)
+  const q=activeQs[qIdx];
+  if(!q||q.id!==id)return;
+  const sel=answers[id];
+  if(!sel)return;
+  clearTimeout(_dtTimer);
+  _dtTimer=setTimeout(()=>{
+    delete insCache[`${id}-${sel}`]; // bust cache so detail is included
+    loadInsight(q,sel);
+  },900);
+}
+
+function goNext(){
+  const q=activeQs[qIdx];if(!answers[q.id])return;
+  qIdx++;activeQs=activeQ();inState={status:'hidden',text:''};
+  if(qIdx>=activeQs.length){
+    screen='results-loading';render();
+    const result=score(answers);
+    if(!result){screen='inelig-age';render();return;}
+    if(result==='pregnant'){screen='inelig-pregnant';render();return;}
+    const rnk=Object.entries(result).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    ranked=rnk;
+    if(!rnk.length){screen='inelig-general';render();return;}
+    buildSummary(answers,rnk,details).then(t=>{summary=t||fallbackSummary(rnk);screen='results';render();});
+    return;
+  }
+  const nq=activeQs[qIdx];
+  if(nq&&answers[nq.id]){
+    const cached=insCache[`${nq.id}-${answers[nq.id]}`];
+    inState=cached?{status:'ready',text:cached}:{status:'loading',text:''};
+    if(!cached)loadInsight(nq,answers[nq.id]);
+  }
+  render();
+}
+
+function goBack(){
+  if(screen==='question'&&qIdx>0){
+    qIdx--;activeQs=activeQ();
+    const q=activeQs[qIdx],sel=answers[q.id],cached=sel?insCache[`${q.id}-${sel}`]:'';
+    inState=cached?{status:'ready',text:cached}:sel?{status:'loading',text:''}:{status:'hidden',text:''};
+    render();if(sel&&!cached)loadInsight(q,sel);
+  }else{screen='welcome';qIdx=0;render();}
+}
+
+function goBackFromResults(){
+  activeQs=activeQ();qIdx=activeQs.length-1;
+  const q=activeQs[qIdx],sel=answers[q.id],cached=sel?insCache[`${q.id}-${sel}`]:'';
+  inState=cached?{status:'ready',text:cached}:{status:'hidden',text:''};
+  screen='question';render();
+}
+
+function submitForm(){
+  const f=n=>document.getElementById(n)?.value.trim();
+  if(!f('ff')||!f('fl')||!f('fp')){alert('Please fill in your name and phone number to continue.');return;}
+  const payload={name:`${f('ff')} ${f('fl')}`,phone:f('fp'),email:f('fe'),location:f('floc'),time:f('ft'),note:f('fn'),
+    topMatch:ranked[0]?PI[ranked[0][0]].name:'',allMatches:ranked.map(([p])=>PI[p].name).join(', '),answers:JSON.stringify(answers)};
+  if(CFG.formUrl){
+    fetch(CFG.formUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .finally(()=>{screen='thankyou';render();});
+  }else{console.log('Form payload:',payload);screen='thankyou';render();}
+}
+
+function resetQuiz(){
+  answers={};details={};activeQs=[];qIdx=0;inState={status:'hidden',text:''};
+  insCache={};inKey='';summary='';ranked=[];screen='welcome';render();
+}
+
+render();
+</script>
+</body>
+</html>
