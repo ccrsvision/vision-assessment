@@ -75,6 +75,7 @@ body::before{content:'';position:fixed;top:-30%;left:50%;transform:translateX(-5
 .detail-box:focus{outline:none;border-color:#93C5FD;background:#F8FBFF;}
 .detail-box::placeholder{color:#94A3B8;}
 
+/* Multi-select checkbox */
 /* Insight panel */
 .insight-panel{background:linear-gradient(135deg,#EFF6FF 0%,#F0FDFA 100%);border:1px solid #BFDBFE;
   border-radius:14px;padding:15px 18px;margin-bottom:18px;display:none;}
@@ -255,7 +256,16 @@ body::before{content:'';position:fixed;top:-30%;left:50%;transform:translateX(-5
   /* Nav buttons full-width on mobile */
   .nav-row{gap:10px;}
   .btn{padding:13px 18px;font-size:14.5px;flex:1;justify-content:center;}
-  /* Insight panel */
+  /* Multi-select checkbox */
+.opt-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s;}
+.opt-check.checked{border-color:var(--blue);background:var(--blue);}
+.opt.disabled{opacity:.35;pointer-events:none;cursor:not-allowed;}
+.opt.selected .opt-label{color:#1E40AF;}
+.opt.selected .opt-desc{color:#3B82F6;}
+@media(max-width:600px){.opt-check{width:20px;height:20px;}}
+
+/* Insight panel */
   .insight-panel{padding:13px 14px;}
   .insight-text{font-size:13px;}
   /* Results */
@@ -307,146 +317,111 @@ const CFG = {
 /* ── FALLBACK INSIGHTS ───────────────────────────────────────────── */
 const FI = {
   age: {
-    u21: "Prescription stability is the first requirement for elective vision correction — most surgeons look for at least 12–24 months of no meaningful change. You're building toward eligibility, and starting this research now puts you well ahead of the curve when the time comes.",
-    '21-40': "You're in the ideal window. Corneal tissue is at peak health and resilience, prescriptions are typically stable, and recovery tends to be fastest at this stage. Whether it's LASIK, SMILE, or EVO ICL, patients in this range consistently achieve outstanding outcomes.",
-    '41-55': "Your 40s introduce presbyopia — the gradual stiffening of the natural lens that makes near focus progressively harder. This doesn't narrow your options; it actually expands them. Modern procedures like RLE with a multifocal IOL can restore clear vision at every distance simultaneously.",
-    '56+': "At this stage, the natural lens has often lost significant focusing range, and early lens changes may be present. Premium IOL procedures — RLE or refractive cataract surgery — address both refractive error and lens aging in a single, highly precise procedure."
+    '18-24': "You're in an exciting range — LASIK, SMILE, and EVO ICL are all possible options for patients 18 and older. Because prescriptions can still shift slightly in your early 20s, Dr. Lee will review your prescription history and corneal data at your consultation to give you an honest, personalized candidacy assessment.",
+    '25-40': "You're in the ideal window. Corneal tissue is at peak health and resilience, prescriptions are typically stable, and recovery tends to be fastest at this stage. Whether it's LASIK, SMILE, or EVO ICL, patients in this range consistently achieve outstanding outcomes.",
+    '41-55': "Your 40s introduce presbyopia — the gradual stiffening of the natural lens that makes near focus progressively harder. This actually expands your options. Modern procedures like RLE with a multifocal IOL can restore clear vision at every distance simultaneously.",
+    '56+': "At this stage, the natural lens has often lost significant focusing range and early changes may be present. Premium IOL procedures — RLE or refractive cataract surgery — address both refractive error and lens aging in a single, highly precise procedure."
   },
   vision: {
-    myopia: "Nearsightedness is one of the most consistently treatable conditions in refractive surgery. LASIK, SMILE, and EVO ICL all achieve excellent results for myopia — the right choice depends on your prescription strength, corneal thickness, and lifestyle factors.",
-    astig: "Astigmatism results from an irregularly shaped cornea and is handled extremely well by modern laser platforms. Both LASIK and SMILE correct astigmatism in the same pass as myopia, with toric IOL options available for lens-based procedures — no extra steps required.",
-    hyperopia: "Farsightedness often responds best to lens-based procedures, particularly as near-focus difficulty enters the picture. The corneal profile in hyperopic eyes is also better preserved with lens-based approaches, supporting stronger long-term outcomes.",
-    presbyopia: "Presbyopia is a lens-aging process, not a refractive error per se — the lens has simply lost its flexibility. Lens-based procedures like RLE directly address the root cause, replacing the stiffened lens with a premium IOL that restores near, intermediate, and distance focus.",
-    cloudy: "Progressive cloudiness, dimness, and halos around lights are hallmark signs of cataract development. Modern refractive cataract surgery has evolved far beyond basic correction — premium IOL options can restore your full refractive range while removing the cataract in a single procedure."
+    myopia: "Nearsightedness is one of the most consistently treatable conditions in refractive surgery. LASIK, SMILE, and EVO ICL all achieve excellent results — the right choice depends on your prescription strength, corneal thickness, and lifestyle.",
+    astig: "Astigmatism is handled extremely well by modern laser platforms. Both LASIK and SMILE correct astigmatism in the same pass as myopia, with toric IOL options for lens-based procedures — no extra steps required.",
+    hyperopia: "Farsightedness often responds best to lens-based procedures, particularly as near-focus difficulty enters the picture. The corneal profile in hyperopic eyes is also better preserved with lens-based approaches.",
+    presbyopia: "Presbyopia is a lens-aging process — the lens has simply lost its flexibility. Lens-based procedures like RLE directly address the root cause, replacing the stiffened lens with a premium IOL that restores near, intermediate, and distance focus.",
+    cloudy: "Progressive cloudiness, dimness, and halos are hallmark signs of cataract development. Modern refractive cataract surgery has evolved far beyond basic correction — premium IOL options can restore your full refractive range while removing the cataract in a single procedure."
   },
   rx: {
-    mild: "Mild prescriptions respond extremely well to laser correction. LASIK in particular achieves very predictable, stable outcomes at this range — most patients achieve 20/20 or better, with a smooth, fast recovery.",
-    mod: "Moderate prescriptions sit comfortably within the treatable range for LASIK and SMILE. If corneal thickness is a limiting factor, EVO ICL becomes an equally excellent alternative — it corrects vision without removing any corneal tissue at all.",
-    high: "Higher prescriptions benefit significantly from SMILE or EVO ICL, both of which handle larger corrections more favorably. The ICL is particularly compelling at high myopia — it delivers exceptional visual quality without touching the corneal surface.",
-    vhigh: "At very high prescriptions, EVO ICL is typically the preferred choice — its correction range extends to -20 diopters of myopia and doesn't depend on corneal thickness. A pre-surgical mapping exam will pinpoint exactly where you fall and which approach offers the best result."
+    mild: "Mild prescriptions respond extremely well to laser correction. LASIK achieves very predictable, stable outcomes at this range — most patients achieve 20/20 or better with a smooth, fast recovery.",
+    mod: "Moderate prescriptions sit comfortably within the treatable range for LASIK and SMILE. If corneal thickness is a limiting factor, EVO ICL becomes an equally excellent alternative — correcting vision without removing any corneal tissue.",
+    high: "At higher prescriptions, EVO ICL is the top recommendation — it corrects up to −20 diopters without touching the cornea, with outstanding optical results. LASIK is also a strong option at this range depending on corneal thickness and anatomy. SMILE remains available as well, and Dr. Lee will identify the best fit at your consultation.",
+    vhigh: "At very high prescriptions, EVO ICL is typically preferred — its range extends to −20 diopters and doesn't depend on corneal thickness. A pre-surgical mapping exam will confirm your exact options."
   },
-  readers: {
-    'yes-always': "Daily reliance on reading glasses indicates well-established presbyopia. A premium multifocal or trifocal IOL through RLE is specifically engineered for this — restoring clear near, intermediate, and distance vision so most patients are completely glasses-free afterward.",
-    'yes-some': "Occasional reading difficulty is an early signal that your natural lens is beginning to lose flexibility. Addressing this now gives you the most flexibility in procedure choice and typically produces the smoothest transition to near-vision freedom.",
-    no: "Intact near vision at your age is an asset — your natural lens still has good accommodative range. For many patients in this situation, laser correction alone can fully address their vision needs without any lens-based component."
-  },
-  dryeye: {
-    none: "Healthy tear function is a genuine advantage for all vision correction procedures. Stable ocular surface health optimizes both surgical outcomes and long-term comfort.",
-    mild: "Mild dryness is very common and highly manageable. Most surgeons recommend a targeted pre-treatment protocol — typically 4–8 weeks of prescription drops — to optimize the ocular surface before surgery and improve outcomes.",
-    moderate: "With moderate dry eye, SMILE and EVO ICL become the most attractive options. SMILE preserves more corneal nerve fibers than LASIK, which supports better long-term tear production, while ICL doesn't interact with the corneal surface at all.",
-    severe: "Chronic dry eye is the most important variable in procedure selection. EVO ICL is typically recommended for severe cases — it has zero impact on corneal nerves or the tear film, making it the most compatible option for a compromised ocular surface."
+  eyehealth: {
+    healthy: "No known eye conditions puts you in the strongest starting position. There are no known contraindications at this point — just clean data for Dr. Lee to work with at your consultation.",
+    dryeye: "Dry eye is very common and highly manageable. SMILE and EVO ICL are both significantly more dry-eye-friendly than traditional LASIK — SMILE preserves more corneal nerves, while EVO ICL doesn't interact with the corneal surface at all.",
+    thincornea: "Thin corneas or keratoconus are contraindications for tissue-removal laser procedures, but EVO ICL is an excellent alternative — it places a lens inside the eye without touching the cornea. Corneal cross-linking may also be relevant to discuss.",
+    glaucoma: "Elevated eye pressure or glaucoma requires careful evaluation before any vision correction. IOP management needs to be stable, and certain procedures can temporarily affect pressure readings. Dr. Lee coordinates with glaucoma specialists as needed.",
+    priorsx: "Prior eye surgery is important context but rarely a permanent barrier. Dr. Lee has extensive experience with complex histories — enhancement procedures, EVO ICL addition, or lens-based approaches may all be viable depending on your current anatomy."
   },
   lifestyle: {
-    desk: "An indoor, lower-impact lifestyle is compatible with all vision correction options. Without contact sport concerns, procedure choice can focus entirely on prescription, corneal anatomy, and visual goals.",
+    desk: "An indoor, low-impact lifestyle is compatible with all vision correction options. Without contact sport concerns, procedure selection can focus entirely on prescription, corneal anatomy, and visual goals.",
     active: "Freedom from glasses and contacts during physical activity is one of the most meaningful benefits of vision correction. All major procedures are well-suited to active lifestyles — most patients return to exercise within a week.",
-    sport: "High-impact and competitive sports favor SMILE or EVO ICL over traditional LASIK, primarily because neither involves a corneal flap that could be displaced. EVO ICL is particularly popular with competitive athletes for its exceptional optical stability.",
-    contact: "Contact and combat sports make EVO ICL the gold standard recommendation. There's no flap, no corneal thinning, and the lens sits securely behind the iris — fully protected from impact. It's the preferred choice for boxers, martial artists, and contact sport athletes."
-  },
-  nightvision: {
-    clear: "Good baseline night vision is a positive indicator across all procedures. Modern laser platforms and premium IOLs are specifically engineered to preserve and often enhance contrast sensitivity and low-light visual performance.",
-    mild: "Mild halos and glare are often related to astigmatism or early lens changes, and they can actually improve significantly after correction. Your surgeon will measure pupil size and corneal wavefront to choose the treatment approach that best minimizes aberrations.",
-    sig: "Significant nighttime symptoms warrant careful evaluation — they can indicate early cataracts, irregular corneal topography, or a larger pupil size. Identifying the underlying cause is essential to selecting a procedure that improves rather than worsens these symptoms."
-  },
-  conditions: {
-    none: "No history of eye disease puts you in the best possible starting position. There are no known contraindications at this point — just clean data for your surgeon to work with.",
-    keratoconus: "Keratoconus and thin corneas are contraindications for tissue-removal laser procedures, but EVO ICL is an excellent alternative — it adds a lens inside the eye without touching the cornea at all. Corneal cross-linking to stabilize progression may also be relevant.",
-    glaucoma: "Elevated eye pressure or glaucoma requires careful evaluation before any vision correction. IOP management needs to be stable, and certain procedures can temporarily affect pressure readings. Dr. Lee coordinates with glaucoma specialists as needed.",
-    other: "Individual eye conditions vary widely in how they affect surgical planning. Dr. Lee has extensive experience with complex histories — the consultation is specifically designed to review your full records and determine the safest, most effective path forward."
-  },
-  surgery: {
-    none: "First-time candidates have the full range of options available. No prior procedure constraints to work around — your surgeon has maximum flexibility in building your treatment plan.",
-    lasik: "Prior LASIK or PRK changes the corneal profile but doesn't rule out further correction. Enhancement procedures, ICL addition, or lens-based approaches may all be viable depending on current anatomy, residual prescription, and corneal thickness.",
-    cataract: "Having had cataract surgery means your natural lens has already been replaced. Residual refractive error may be addressable with a laser enhancement or piggyback IOL — your surgeon can evaluate this precisely with current imaging.",
-    other: "Prior eye surgery is important context but rarely a barrier. Dr. Lee has extensive experience with complex surgical histories and will review your prior records thoroughly."
-  },
-  pregnant: {
-    no: "Hormonal stability is important for accurate pre-surgical measurements, and you're clear to proceed with your assessment and follow-up clinical evaluation.",
-    yes: "Hormonal shifts during pregnancy and nursing temporarily affect corneal curvature and prescription — making pre-surgical measurements unreliable. All elective procedures should wait until several months after nursing ends. We'd be glad to plan your consultation for that time."
+    sport: "High-impact and competitive sports favor SMILE or EVO ICL over traditional LASIK, primarily because neither involves a corneal flap. EVO ICL is especially popular with competitive athletes for its exceptional optical stability.",
+    contact: "Contact and combat sports make EVO ICL the gold standard recommendation. No flap, no corneal thinning, and the lens sits securely behind the iris — fully protected from impact. The preferred choice for boxers, martial artists, and contact sport athletes."
   },
   goal: {
     distance: "Clear unaided distance vision — for driving, travel, sports, and daily life — is the most common goal, and one that laser and lens procedures fulfill with remarkable consistency. Most patients achieve 20/20 or better.",
     reading: "Eliminating reading glasses is one of the most personally meaningful vision goals. Premium IOL procedures with multifocal or EDOF lenses are specifically engineered for this — restoring the near-focus flexibility your natural lens has gradually lost.",
-    both: "Full spectacle independence at all distances — near, intermediate, and far — is achievable with today's premium trifocal and EDOF IOLs. Most patients report being completely glasses-free for everything from reading menus to night driving.",
-    freedom: "Waking up to clear, natural vision every morning is one of the most transformative experiences refractive surgery delivers. The right procedure, precisely matched to your anatomy and prescription, provides exactly that — consistently and permanently."
+    both: "Full spectacle independence at all distances is achievable with today's premium trifocal and EDOF IOLs. Most patients report being completely glasses-free for everything from reading menus to night driving.",
+    freedom: "Waking up to clear, natural vision every morning is one of the most transformative experiences refractive surgery delivers. The right procedure, matched precisely to your anatomy and prescription, provides exactly that — permanently."
+  },
+  pregnant: {
+    no: "Hormonal stability is important for accurate pre-surgical measurements, and you're clear to proceed with your consultation and evaluation.",
+    yes: "Hormonal shifts during pregnancy and nursing temporarily affect corneal curvature and prescription — making pre-surgical measurements unreliable. All elective procedures should wait until several months after nursing ends."
   }
 };
 
 /* ── QUESTIONS ───────────────────────────────────────────────────── */
 const Qs = [
   { id:'age', text:'How old are you?',
-    sub:'Age is the most important factor in determining which procedures are safe, effective, and appropriate for your vision.',
-    dp:'Any context about your age or how long you\'ve worn glasses/contacts?',
-    opts:[{v:'u21',l:'Under 21',d:'Vision may still be changing year to year'},
-          {v:'21-40',l:'21 to 40',d:'Prime window for laser and lens-based correction'},
-          {v:'41-55',l:'41 to 55',d:'Near-vision or reading changes may be a factor'},
-          {v:'56+',l:'56 or older',d:'Lens-based procedures are often most appropriate'}] },
-  { id:'vision', text:'What best describes your vision problem?',
-    sub:'Choose the option that most closely matches what your eye doctor has told you — or what you notice day to day.',
-    dp:'Has your prescription changed recently? Any other symptoms?',
-    opts:[{v:'myopia',l:'Nearsighted',d:'Distant objects blurry — driving, TV, distance'},
-          {v:'astig',l:'Nearsighted + astigmatism',d:'Blurry at distance plus distortion or halos at night'},
-          {v:'hyperopia',l:'Farsighted',d:'Near objects blurry or cause headaches / eye strain'},
-          {v:'presbyopia',l:'Trouble reading up close only',d:'Recently needing reading glasses; distance vision still fine'},
-          {v:'cloudy',l:'Cloudy, foggy, or progressively dim',d:'Vision has worsened; glare or halos around lights'}] },
-  { id:'rx', text:'What is your approximate prescription strength?',
-    sub:'Check your eyeglass or contact lens Rx. Minus (−) = nearsighted. Plus (+) = farsighted.',
+    sub:'Age shapes which procedures are appropriate and how Dr. Lee approaches your candidacy.',
+    dp:'How long have you been wearing glasses or contacts?',
+    opts:[{v:'18-24',l:'18 to 24',d:'Vision may still be stabilizing — Dr. Lee will evaluate candidacy'},
+          {v:'25-40',l:'25 to 40',d:'Prime window for laser and lens-based correction'},
+          {v:'41-55',l:'41 to 55',d:'Near-vision changes may be a factor — more options available'},
+          {v:'56+',  l:'56 or older',d:'Lens-based procedures are often the most comprehensive choice'}] },
+
+  { id:'vision', text:'What best describes your vision?',
+    sub:'Choose the option closest to what your eye doctor has told you — or what you notice day to day.',
+    dp:'Has your prescription changed recently? Any other symptoms worth mentioning?',
+    filterOpts: a => {
+      const hide = a.age==='18-24' ? ['presbyopia','cloudy'] : [];
+      return [{v:'myopia',    l:'Nearsighted',                        d:'Distant objects are blurry — driving, TV, sports'},
+              {v:'astig',     l:'Nearsighted with astigmatism',       d:'Blurry at distance plus distortion or halos at night'},
+              {v:'hyperopia', l:'Farsighted',                         d:'Near objects blurry or cause headaches and eye strain'},
+              {v:'presbyopia',l:'Trouble reading up close only',      d:'Recently needing reading glasses; distance vision still fine'},
+              {v:'cloudy',    l:'Cloudy, foggy, or progressively dim',d:'Vision has worsened; glare or halos around lights at night'}
+             ].filter(o => !hide.includes(o.v));
+    } },
+
+  { id:'rx', text:'How strong is your prescription?',
+    sub:'Check your eyeglass or contact Rx. Minus (−) = nearsighted. Plus (+) = farsighted. The Sphere (SPH) number is what matters most.',
     skip: a => a.vision==='presbyopia'||a.vision==='cloudy',
-    dp:'Know your exact Rx numbers? Feel free to share them here.',
-    opts:[{v:'mild',l:'Mild',d:'Under ±3.00 — light correction needed'},
-          {v:'mod',l:'Moderate',d:'±3.00 to ±6.00 — rely on corrective lenses daily'},
-          {v:'high',l:'High',d:'±6.00 to ±10.00 — thick lenses, strong contacts'},
-          {v:'vhigh',l:'Very high / not sure',d:'Greater than ±10.00, or unsure of exact Rx'}] },
-  { id:'readers', text:'Do you currently need reading glasses?',
-    sub:'Near-vision difficulty after 40 is a key presbyopia signal that directly influences which procedures deliver the best outcome.',
-    skip: a => a.age==='u21'||a.age==='21-40',
-    dp:'When did this start? Any other notes about your near vision?',
-    opts:[{v:'yes-always',l:'Yes — every day',d:'Can\'t read comfortably without reading glasses'},
-          {v:'yes-some',l:'Yes — occasionally',d:'Fine print or dim light requires them'},
-          {v:'no',l:'No — near vision is still sharp',d:'No reading glasses needed yet'}] },
-  { id:'dryeye', text:'How would you describe your eye dryness or irritation?',
-    sub:'Tear film health significantly influences which procedure is the safest, most comfortable choice for your eyes.',
-    dp:'Do you use artificial tears? Have you been diagnosed with dry eye disease?',
-    opts:[{v:'none',l:'Rarely or never',d:'Eyes are comfortable most of the time'},
-          {v:'mild',l:'Occasionally',d:'Mild dryness in AC, wind, or on screens'},
-          {v:'moderate',l:'Frequently — I use eye drops',d:'Regular reliance on artificial tears; daily discomfort'},
-          {v:'severe',l:'Severe or chronic',d:'Diagnosed dry eye disease or constant symptoms'}] },
-  { id:'lifestyle', text:'How would you describe your physical lifestyle?',
-    sub:'Activity level — especially contact sports — is critical for determining which procedure is the most stable and safest long-term.',
-    dp:'Any specific sports or activities you\'re hoping to protect your vision for?',
-    opts:[{v:'desk',l:'Mostly indoors / desk-based',d:'Office, home, low-impact daily life'},
-          {v:'active',l:'Moderately active',d:'Gym, yoga, hiking, cycling, recreational sports'},
-          {v:'sport',l:'Competitive or high-impact sports',d:'Running, swimming, tennis, skiing, surfing, etc.'},
-          {v:'contact',l:'Contact or combat sports',d:'Boxing, MMA, wrestling, football, hockey'}] },
-  { id:'nightvision', text:'How is your night vision currently?',
-    sub:'Night vision quality can reveal underlying conditions that affect your treatment path.',
-    dp:'Any specific night-vision situations that concern you?',
-    opts:[{v:'clear',l:'Clear — no issues',d:'Comfortable driving at night, no visual artifacts'},
-          {v:'mild',l:'Mild halos or glare',d:'Slight rings around headlights or streetlamps'},
-          {v:'sig',l:'Significant halos or glare',d:'Noticeable difficulty with night driving or bright lights'}] },
-  { id:'conditions', text:'Have you been diagnosed with any of these eye conditions?',
-    sub:'Certain conditions directly affect which procedures are safe and appropriate for you.',
-    dp:'Any other diagnoses, family eye history, or concerns?',
-    opts:[{v:'none',l:'None of these',d:'No known eye disease diagnoses'},
-          {v:'keratoconus',l:'Keratoconus or thin corneas',d:'Irregular, thinning, or cone-shaped cornea'},
-          {v:'glaucoma',l:'Glaucoma or elevated eye pressure',d:'Elevated IOP or optic nerve changes'},
-          {v:'other',l:'Other condition / unsure',d:'Retinal issues, amblyopia, or uncertain history'}] },
-  { id:'surgery', text:'Have you had previous eye surgery?',
-    dp:'Details about prior surgery (procedure, year, complications) are helpful to include.',
-    opts:[{v:'none',l:'No — this would be my first',d:''},
-          {v:'lasik',l:'Yes — prior LASIK or PRK',d:'May be considering an enhancement or retreatment'},
-          {v:'cataract',l:'Yes — cataract surgery',d:''},
-          {v:'other',l:'Yes — other eye surgery',d:''}] },
+    dp:'Know your exact numbers? Feel free to share them here.',
+    opts:[{v:'mild', l:'Mild — under ±3.00',      d:'Light correction, excellent laser candidates'},
+          {v:'mod',  l:'Moderate — ±3.00 to ±6.00',d:'Strong candidates for laser correction or EVO ICL'},
+          {v:'high', l:'High — ±6.00 to ±10.00',   d:'Strong candidates for EVO ICL and laser correction'},
+          {v:'vhigh',l:'Very high or unsure',        d:'Greater than ±10.00, or not sure of your Rx'}] },
+
+  { id:'eyehealth', text:'Which of these apply to your eye health?',
+    sub:'Select all that apply. This helps us understand if any special considerations affect your candidacy.',
+    multi:true,
+    dp:'Any other eye history, diagnoses, or family eye conditions worth mentioning?',
+    opts:[{v:'healthy',    l:'No known eye conditions',               d:'No diagnosed eye disease, no prior eye surgery'},
+          {v:'dryeye',     l:'Dry eye or chronic eye irritation',     d:'Regular use of drops, or diagnosed dry eye disease'},
+          {v:'thincornea', l:'Thin corneas or keratoconus',           d:'Irregular or thinning cornea — affects laser options'},
+          {v:'glaucoma',   l:'Glaucoma or elevated eye pressure',     d:'Elevated IOP or optic nerve changes'},
+          {v:'priorsx',    l:'Previous eye surgery (LASIK, cataract, other)', d:'Prior procedure that may affect current options'}] },
+
+  { id:'lifestyle', text:'How would you describe your lifestyle?',
+    sub:'Activity level — especially contact sports — is one of the most important factors in choosing the right procedure.',
+    dp:'Any specific sport or activity driving your interest in vision correction?',
+    opts:[{v:'desk',   l:'Mostly indoors / office-based', d:'Low-impact daily life, desk work, screens'},
+          {v:'active', l:'Moderately active',              d:'Gym, yoga, hiking, cycling, recreational sports'},
+          {v:'sport',  l:'Competitive or high-impact sports',d:'Running, swimming, skiing, tennis, surfing'},
+          {v:'contact',l:'Contact or combat sports',        d:'Boxing, MMA, wrestling, football, hockey'}] },
+
+  { id:'goal', text:'What is your primary vision goal?',
+    sub:'Your answer here helps match you to the procedure that delivers the most meaningful change for your daily life.',
+    dp:'Anything specific driving this — career, sport, travel, lifestyle change?',
+    opts:[{v:'distance',l:'See clearly at distance without glasses', d:'Driving, movies, sports, everyday distance vision'},
+          {v:'reading', l:'Read without glasses',                    d:'Menus, phones, books — no more readers'},
+          {v:'both',    l:'Reduce dependence on glasses for both far and near',d:'Less reliance on glasses at all distances'},
+          {v:'freedom', l:'Complete glasses freedom',                d:'Remove dependence from glasses for all distances'}] },
+
   { id:'pregnant', text:'Are you currently pregnant or nursing?',
     sub:'Elective vision correction is postponed during pregnancy and breastfeeding — a medical requirement, not a permanent barrier.',
-    opts:[{v:'no',l:'No',d:''},
-          {v:'yes',l:'Yes — currently pregnant or nursing',d:''}] },
-  { id:'goal', text:'What is your primary vision goal?',
-    sub:'Understanding your priorities helps us match you to the procedure that delivers the most meaningful outcome for your life.',
-    dp:'Anything specific driving this goal — career, sport, lifestyle change?',
-    opts:[{v:'distance',l:'See clearly at distance without glasses',d:'Driving, movies, sports, everyday distance vision'},
-          {v:'reading',l:'Read without glasses',d:'Menus, phones, books — no more reading glasses'},
-          {v:'both',l:'Both near and far vision',d:'Comprehensive correction at all distances'},
-          {v:'freedom',l:'Complete glasses freedom',d:'Wake up and simply see clearly every morning'}] }
+    opts:[{v:'no', l:'No',                                  d:''},
+          {v:'yes',l:'Yes — currently pregnant or nursing', d:''}] }
 ];
 
 /* ── PROC INFO ───────────────────────────────────────────────────── */
@@ -459,7 +434,7 @@ const PI = {
     tags:['Flapless technique','Dry-eye friendly','Active & contact sports','High myopia range'],url:'https://ccrsclearvision.com/smile-lasik/'},
   icl:{name:'EVO ICL',tagline:'Implantable lens for extraordinary clarity',
     desc:'The EVO Implantable Collamer Lens is placed inside the eye, behind the iris — without removing any corneal tissue. It corrects very high prescriptions (up to −20D), is fully reversible, has a built-in UV filter, and carries no dry eye risk. CCRS ranks among the top national EVO ICL providers.',
-    tags:['High & very high Rx','Reversible & additive','No corneal tissue removed','Top national ICL center'],url:'https://ccrsclearvision.com/icl-surgery/'},
+    tags:['High & very high Rx','Reversible & additive','No corneal tissue removed','Top national EVO ICL center'],url:'https://ccrsclearvision.com/icl-surgery/'},
   rle:{name:'Refractive Lens Exchange (RLE)',tagline:'Comprehensive vision freedom for 40+',
     desc:'RLE replaces the natural eye lens with a premium multifocal or extended-depth IOL, restoring clear near, intermediate, and distance vision simultaneously. Because the natural lens is replaced, cataracts are permanently prevented. Ideal when both distance and reading vision are priorities.',
     tags:['Age 40+','Eliminates reading glasses','Prevents cataracts permanently','Premium multifocal IOL'],url:'https://ccrsclearvision.com/refractive-lens-exchange/'},
@@ -471,37 +446,50 @@ const PI = {
 /* ── SCORING ─────────────────────────────────────────────────────── */
 function score(a){
   const s={lasik:0,smile:0,icl:0,rle:0,cataract:0};
-  if(a.age==='u21')return null;
-  if(a.pregnant==='yes')return'pregnant';
-  if(a.age==='56+'){s.cataract+=5;s.rle+=4;}
+
+  // Age — 18-24 is now allowed but flagged for Dr. Lee review
+  if(a.pregnant==='yes') return 'pregnant';
+  if(a.age==='18-24'){s.lasik+=2;s.smile+=2;s.icl+=2;} // eligible but needs Dr. Lee eval
+  if(a.age==='25-40'){s.lasik+=3;s.smile+=3;s.icl+=3;}
   if(a.age==='41-55'){s.rle+=3;s.lasik+=1;s.smile+=1;s.cataract+=1;}
-  if(a.age==='21-40'){s.lasik+=3;s.smile+=3;s.icl+=3;}
+  if(a.age==='56+'){s.cataract+=5;s.rle+=4;}
+
+  // Vision type
   if(a.vision==='myopia'){s.lasik+=3;s.smile+=3;s.icl+=2;}
   if(a.vision==='astig'){s.lasik+=3;s.smile+=2;s.icl+=2;}
   if(a.vision==='hyperopia'){s.lasik+=2;s.rle+=3;}
   if(a.vision==='presbyopia'){s.rle+=5;s.lasik+=1;}
   if(a.vision==='cloudy'){s.cataract+=6;s.rle+=3;}
+
+  // Rx strength
   if(a.rx==='mild'){s.lasik+=3;s.smile+=1;}
   if(a.rx==='mod'){s.lasik+=2;s.smile+=3;s.icl+=1;}
-  if(a.rx==='high'){s.icl+=4;s.smile+=3;s.lasik+=1;}
+  if(a.rx==='high'){s.icl+=3;s.lasik+=3;s.smile+=1;}
   if(a.rx==='vhigh'){s.icl+=5;s.rle+=3;s.smile+=1;}
-  if(a.readers==='yes-always'){s.rle+=4;}
-  if(a.readers==='yes-some'){s.rle+=2;}
-  if(a.dryeye==='moderate'){s.lasik-=2;s.smile+=2;s.icl+=1;}
-  if(a.dryeye==='severe'){s.lasik-=4;s.smile+=3;s.icl+=2;}
+
+  // Eye health (combined)
+  // Eye health (multi-select — check if array includes each value)
+  const eh=Array.isArray(a.eyehealth)?a.eyehealth:(a.eyehealth?[a.eyehealth]:[]);
+  if(eh.includes('dryeye')){s.lasik-=2;s.smile+=2;s.icl+=2;}
+  if(eh.includes('thincornea')){s.lasik=0;s.smile=0;s.icl+=4;}
+  if(eh.includes('glaucoma')){s.icl=Math.max(0,s.icl-2);}
+  if(eh.includes('priorsx')){s.icl+=1;s.rle+=1;}
+
+  // Lifestyle
   if(a.lifestyle==='contact'){s.icl+=3;s.smile+=2;s.lasik-=2;}
   if(a.lifestyle==='sport'){s.smile+=1;s.icl+=1;}
-  if(a.nightvision==='sig'){s.cataract+=2;s.rle+=1;}
-  if(a.conditions==='keratoconus'){s.lasik=0;s.smile=0;s.icl+=3;}
-  if(a.conditions==='glaucoma'){s.icl=Math.max(0,s.icl-2);}
-  if(a.surgery==='lasik'){s.icl+=1;s.rle+=1;}
-  if(a.surgery==='cataract'){s.rle=0;s.cataract=0;}
+
+  // Goal
   if(a.goal==='reading'){s.rle+=2;}
   if(a.goal==='both'){s.rle+=1;s.icl+=1;}
   if(a.goal==='freedom'){s.rle+=1;s.icl+=1;}
+
   Object.keys(s).forEach(k=>{if(s[k]<0)s[k]=0;});
   return s;
 }
+
+// Check if patient is 18-24 — used to show Dr. Lee candidacy note on results
+function isYoungAdult(a){ return a.age==='18-24'; }
 
 /* ── STATE ───────────────────────────────────────────────────────── */
 let screen='welcome',qIdx=0,answers={},details={},activeQs=[],
@@ -532,7 +520,7 @@ async function loadInsight(q,val){
   const key=`${q.id}-${val}`;inKey=key;
   if(insCache[key]){inState={status:'ready',text:insCache[key]};patchInsight();return;}
   inState={status:'loading',text:''};patchInsight();
-  const opt=q.opts.find(o=>o.v===val);
+  const opt=(q.filterOpts?q.filterOpts(answers):(q.opts||[])).find(o=>o.v===val)||{l:val};
   const text=await callInsightAPI(q.text,opt?.l||val,details[q.id]||'')||FI[q.id]?.[val]||'';
   if(inKey===key){insCache[key]=text;inState={status:'ready',text};patchInsight();}
 }
@@ -571,7 +559,7 @@ function fallbackSummary(rnk){
   const f={
     lasik:"Based on your profile, you appear to be a strong candidate for laser vision correction. Your prescription range, eye health history, and lifestyle all align well with LASIK — the most commonly performed and most extensively studied elective vision procedure in the world.",
     smile:"Your profile points to SMILE as a particularly well-suited option — combining effective correction with the flapless, dry-eye-friendly design that fits your eye health and active lifestyle. Dr. Lee is a recognized SMILE pioneer with extensive experience at the leading edge of this technique.",
-    icl:"Your assessment suggests EVO ICL as a strong match — likely due to prescription strength, lifestyle factors, or dry eye considerations. The ICL's additive, reversible design makes it one of the most versatile and optically precise procedures available, and CCRS ranks among the nation's top ICL centers.",
+    icl:"Your assessment suggests EVO ICL as a strong match — likely due to prescription strength, lifestyle factors, or dry eye considerations. The EVO ICL's additive, reversible design makes it one of the most versatile and optically precise procedures available, and CCRS ranks among the nation's top EVO ICL centers.",
     rle:"Your vision profile — particularly the combination of age and near-vision needs — points clearly toward a lens-based solution. Refractive Lens Exchange with a premium IOL is specifically designed for your situation: restoring comprehensive, glasses-free vision at all distances while permanently preventing future cataracts.",
     cataract:"Your responses suggest lens changes may be contributing to your vision symptoms. Modern refractive cataract surgery at CCRS is a precision procedure — with premium IOL options, it can restore your full refractive range while addressing the underlying lens issue."
   };
@@ -590,7 +578,7 @@ function render(){
 function renderWelcome(){return`<div class="card screen"><div class="card-accent"></div>
 <div class="welcome-eye"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><ellipse cx="14" cy="14" rx="11" ry="7" stroke="#2563EB" stroke-width="1.5"/><circle cx="14" cy="14" r="4" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/><circle cx="15.5" cy="12.5" r="1" fill="#2563EB"/></svg></div>
 <div class="welcome-title">Find Your Vision<br>Correction Match</div>
-<div class="welcome-desc">Answer 11 questions about your vision, lifestyle, and goals. At every step, you'll receive a personalized clinical insight — so you walk away educated and informed, not just categorized.</div>
+<div class="welcome-desc">Answer 7 quick questions about your vision, lifestyle, and goals. At every step, you'll receive a personalized clinical insight — so you walk away educated and informed, not just categorized.</div>
 <div class="procs-row"><span class="proc-chip">LASIK</span><span class="proc-chip">SMILE</span><span class="proc-chip">EVO ICL</span><span class="proc-chip">RLE</span><span class="proc-chip">Cataract Surgery</span></div>
 <div class="feature-list">
   <div class="feature-item"><div class="feature-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Personalized AI insights at every question — not just at the end</div>
@@ -604,7 +592,9 @@ function renderQuestion(){
   const q=activeQs[qIdx];
   const pct=Math.round(((qIdx+1)/activeQs.length)*100);
   const sel=answers[q.id],isLast=qIdx===activeQs.length-1;
-  const insHtml=sel?(inState.status==='loading'
+  const qOpts=q.filterOpts?q.filterOpts(answers):(q.opts||[]);
+  const hasAnswer=q.multi?(Array.isArray(answers[q.id])&&answers[q.id].length>0):(!!sel);
+  const insHtml=hasAnswer?(inState.status==='loading'
     ?`<div class="insight-loading"><div class="insight-dots"><span></span><span></span><span></span></div><span class="insight-loading-label">Analyzing your response…</span></div>`
     :inState.text?`<div class="insight-header"><div class="insight-icon-wrap"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="7" rx="5.5" ry="3.5" stroke="#2563EB" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.2"/><circle cx="7.8" cy="6.2" r="0.6" fill="#2563EB"/></svg></div><span class="insight-label">What this means for you</span></div><div class="insight-text">${inState.text}</div>`:''):'';
   return`<div class="card screen"><div class="card-accent"></div>
@@ -614,7 +604,9 @@ function renderQuestion(){
 <div class="q-text">${q.text}</div>
 ${q.sub?`<div class="q-sub">${q.sub}</div>`:'<div style="height:14px"></div>'}
 <div class="options-list">
-${q.opts.map(o=>`<button class="opt${sel===o.v?' selected':''}" onclick="pick('${q.id}','${o.v}')"><div class="opt-radio"><div class="opt-dot"></div></div><div class="opt-body"><div class="opt-label">${o.l}</div>${o.d?`<div class="opt-desc">${o.d}</div>`:''}</div></button>`).join('')}
+${q.multi
+  ? qOpts.map(o=>{const sa=Array.isArray(answers[q.id])?answers[q.id]:[];const chk=sa.includes(o.v);const dis=q.id==='eyehealth'&&((o.v==='healthy'&&sa.some(v=>v!=='healthy'))||(o.v!=='healthy'&&sa.includes('healthy')));return`<button class="opt${chk?' selected':''}${dis?' disabled':''}" onclick="pickMulti('${q.id}','${o.v}')"><div class="opt-check${chk?' checked':''}">${chk?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}</div><div class="opt-body"><div class="opt-label">${o.l}</div>${o.d?`<div class="opt-desc">${o.d}</div>`:''}</div></button>`;}).join('')
+  : qOpts.map(o=>`<button class="opt${sel===o.v?' selected':''}" onclick="pick('${q.id}','${o.v}')"><div class="opt-radio"><div class="opt-dot"></div></div><div class="opt-body"><div class="opt-label">${o.l}</div>${o.d?`<div class="opt-desc">${o.d}</div>`:''}</div></button>`).join('')}
 </div>
 ${q.dp?`<div class="detail-wrap">
   <div class="detail-label">
@@ -626,7 +618,7 @@ ${q.dp?`<div class="detail-wrap">
 <div class="insight-panel${sel?' visible':''}" id="ip">${insHtml}</div>
 <div class="nav-row">
   <button class="btn btn-ghost" onclick="goBack()">← Back</button>
-  <button class="btn btn-primary" onclick="goNext()"${!sel?' disabled':''}>${isLast?'See My Results →':'Continue →'}</button>
+  <button class="btn btn-primary" onclick="goNext()"${!hasAnswer?' disabled':''}>${isLast?'See My Results →':'Continue →'}</button>
 </div></div>`;}
 
 function renderLoading(){return`<div class="card screen"><div class="card-accent"></div>
@@ -661,7 +653,7 @@ ${rnk.map(([p],i)=>{const pr=PI[p];return`<div class="proc-card ${cc[i]}"><div c
   <div class="trust-divider"><div class="tdl"></div><div class="tdt">Your CCRS team</div><div class="tdl"></div></div>
   <div class="dr-card">
     <div class="dr-avatar"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="white" stroke-width="1.3"/><path d="M3 19c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-    <div><div class="dr-name">Dr. Paul C. Lee, MD</div><div class="dr-title">Medical Director, CCRS Clear Vision · Refractive & Cataract Surgery Specialist</div><div class="dr-creds"><span class="cred-tag">SMILE Pioneer</span><span class="cred-tag">Top National ICL Surgeon</span><span class="cred-tag">ZEISS VisuMax Certified</span><span class="cred-tag">ALCON EX500 Platform</span></div></div>
+    <div><div class="dr-name">Dr. Paul C. Lee, MD</div><div class="dr-title">Medical Director, CCRS Clear Vision · Refractive & Cataract Surgery Specialist</div><div class="dr-creds"><span class="cred-tag">SMILE Pioneer</span><span class="cred-tag">Top National EVO ICL Surgeon</span><span class="cred-tag">ZEISS VisuMax Certified</span><span class="cred-tag">ALCON EX500 Platform</span></div></div>
   </div>
   <div class="trust-divider" style="margin-bottom:14px;"><div class="tdl"></div><div class="tdt">What to expect at your free consultation</div><div class="tdl"></div></div>
   <div class="consult-steps">
@@ -748,6 +740,35 @@ function pick(id,val){
   else render();
 }
 
+function pickMulti(id,val){
+  let arr=Array.isArray(answers[id])?[...answers[id]]:[];
+  const idx=arr.indexOf(val);
+  // Mutual exclusivity for eyehealth: 'healthy' clears conditions and vice versa
+  if(id==='eyehealth'){
+    if(val==='healthy'){
+      arr=idx>-1?[]:[val]; // toggle healthy on/off, always clear others
+    } else {
+      arr=arr.filter(v=>v!=='healthy'); // remove healthy if a condition is picked
+      if(idx>-1){arr.splice(arr.indexOf(val),1);}else{arr.push(val);}
+    }
+  } else {
+    if(idx>-1){arr.splice(idx,1);}else{arr.push(val);}
+  }
+  answers[id]=arr;
+  // Trigger insight based on first/latest selection
+  if(arr.length>0){
+    inState={status:'loading',text:''};
+    render();
+    const q=activeQs[qIdx];
+    // Use last toggled value for insight
+    if(idx===-1) loadInsight(q,val);
+    else if(arr.length>0) loadInsight(q,arr[arr.length-1]);
+    else {inState={status:'hidden',text:''};render();}
+  } else {
+    inState={status:'hidden',text:''};render();
+  }
+}
+
 // toggleDetail removed — textarea is now always visible
 
 let _dtTimer=null;
@@ -766,12 +787,14 @@ function saveDetail(id,val){
 }
 
 function goNext(){
-  const q=activeQs[qIdx];if(!answers[q.id])return;
+  const q=activeQs[qIdx];
+  const ans=answers[q.id];
+  const hasAns=q.multi?(Array.isArray(ans)&&ans.length>0):!!ans;
+  if(!hasAns)return;
   qIdx++;activeQs=activeQ();inState={status:'hidden',text:''};
   if(qIdx>=activeQs.length){
     screen='results-loading';render();
     const result=score(answers);
-    if(!result){screen='inelig-age';render();return;}
     if(result==='pregnant'){screen='inelig-pregnant';render();return;}
     const rnk=Object.entries(result).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,3);
     ranked=rnk;
@@ -780,10 +803,12 @@ function goNext(){
     return;
   }
   const nq=activeQs[qIdx];
-  if(nq&&answers[nq.id]){
-    const cached=insCache[`${nq.id}-${answers[nq.id]}`];
+  const nqAns=answers[nq.id];
+  const nqVal=Array.isArray(nqAns)?nqAns[nqAns.length-1]:nqAns;
+  if(nq&&nqVal){
+    const cached=insCache[`${nq.id}-${nqVal}`];
     inState=cached?{status:'ready',text:cached}:{status:'loading',text:''};
-    if(!cached)loadInsight(nq,answers[nq.id]);
+    if(!cached)loadInsight(nq,nqVal);
   }
   render();
 }
